@@ -1,0 +1,39 @@
+{
+  "name": "@ainize-team/hyperagents",
+  "version": "1.0.0",
+  "main": "dist/hyperagents.js",
+  "types": "dist/hyperagents.d.ts",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "dev": "rm -rf ./dist && tsc",
+    "test": "NODE_ENV=dev jest --passWithNoTests",
+    "docs": "yarn build && typedoc --options typedoc.json --out docs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ainize-team/hyperagents.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ainize-team/hyperagents/issues"
+  },
+  "homepage": "https://github.com/ainize-team/hyperagents#readme",
+  "description": "",
+  "dependencies": {
+    "@azure/identity": "^4.7.0",
+    "@types/node": "^22.13.5",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "openai": "^4.85.4",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}
