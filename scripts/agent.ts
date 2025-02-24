@@ -6,9 +6,6 @@ import GraphTask from "../src/GraphTask";
 import dotenv from "dotenv";
 dotenv.config();
 
-const MEMORY_ID = "inmemory-1";
-
-
 const max = new Agent({
   prompt: "You are a max agent. you are a writer",
   llm: LLMType.gpt4o,
@@ -16,7 +13,6 @@ const max = new Agent({
   llmEndpoint: process.env.OPENAI_BASE_URL,
   llmApiKey: process.env.OPENAI_API_KEY,
   memoryType: MemoryType.inMemory,
-  memoryId: MEMORY_ID,
 });
 
 const victoria = new Agent({
@@ -26,7 +22,6 @@ const victoria = new Agent({
   llmEndpoint: process.env.OPENAI_BASE_URL,
   llmApiKey: process.env.OPENAI_API_KEY,
   memoryType: MemoryType.inMemory,
-  memoryId: MEMORY_ID,
 });
 
 const graph = new Graph();
@@ -34,14 +29,12 @@ const graph = new Graph();
 graph.addAgentNode({agent: max, name: "max"});
 graph.addAgentNode({agent: victoria, name: "victoria"});
 
-graph.addEdge({from: "max", to: "victoria", prompt: "max write a first draft of an article."});
+graph.addEdge({from: "max", to: "victoria", prompt: "please review the article and give feedback."});
+graph.setEntryPoint("max", "write a first draft of an article.");
 
-const edges = graph.getEdges("max");
+const task = new GraphTask(graph, InMemoryMemory.getInstance());
 
-const memory = new InMemoryMemory();
-
-const task = new GraphTask(graph);
-
+task.runTask("write a article about dogecoin.");
 
 
 // agent.runPrompt("What is the capital of the moon?").then((result) => {

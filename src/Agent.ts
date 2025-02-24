@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { LLMType, MemoryType } from './type';
+import { LLMType, Memory, MemoryType } from './type';
+import InMemoryMemory from './InMemoryMemory';
 interface AgentConfig {
   prompt: string;
   llm: LLMType;
@@ -7,7 +8,6 @@ interface AgentConfig {
   llmEndpoint?: string;
   llmApiKey?: string;
   memoryType: MemoryType;
-  memoryId: string;
 }
 
 class Agent {
@@ -17,7 +17,7 @@ class Agent {
   private llmEndpoint?: string;
   private llmApiKey?: string;
   private memoryType: MemoryType;
-  private memoryId: string;
+  private memory: Memory;
   constructor(config: AgentConfig) {
     this.prompt = config.prompt;
     this.llm = config.llm;
@@ -25,7 +25,11 @@ class Agent {
     this.llmEndpoint = config.llmEndpoint;
     this.llmApiKey = config.llmApiKey;
     this.memoryType = config.memoryType;
-    this.memoryId = config.memoryId;
+    if (this.memoryType === MemoryType.inMemory) {
+      this.memory = InMemoryMemory.getInstance();
+    }else {
+      throw new Error("Memory type not supported");
+    }
   }
 
   public getPrompt() {
@@ -39,8 +43,9 @@ class Agent {
   public getPublicDesc() {
     return this.publicDesc;
   }
+  
 
-  public async runPrompt(input: string): Promise<string> {
+  public async run(input: string): Promise<string> {
 
     const chatCompletion = await axios.post(this.llmEndpoint!,{
       "model": "gpt-4o-2024-05-13",

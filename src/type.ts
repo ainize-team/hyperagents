@@ -5,8 +5,14 @@ export enum LLMType {
 export enum MemoryType {
   inMemory = "InMemory",
 }
+
+export interface Message {
+  author: string;
+  content: string;
+}
+
 export interface Memory {
   init(): Promise<void>;
-  add(data:string): Promise<void>;
-  load(): Promise<Array<string>>;
+  add(data:Message): Promise<void>;
+  load(): Promise<Array<Message>>;
 }
