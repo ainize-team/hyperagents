@@ -2,3 +2,7 @@
 .env.dev
 .env.local
 .env.prod
+
+node_modules/
+
+yarn.lock
