@@ -10,13 +10,18 @@ interface EdgeData {
 class Graph {
   private node: Map<string, Agent>;
   private edge: Map<string, Map<string, EdgeData>>;
+  private entry_point?: string;
   constructor() {
     this.node = new Map();
     this.edge = new Map();
   }
 
-  addAgentNode(nodeconfig: {agent?: Agent, name: string}) {
-    this.node.set(nodeconfig.name, nodeconfig.agent? nodeconfig.agent);
+  setEntryPoint(name: string) {
+    this.entry_point = name;
+  }
+
+  addAgentNode(nodeconfig: {agent: Agent, name: string}) {
+    this.node.set(nodeconfig.name, nodeconfig.agent);
   }
   
   addEdge(edgeConfig: {from: string, to: string, prompt: string, bandwith: number}) {
