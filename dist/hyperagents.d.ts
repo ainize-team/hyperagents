@@ -1,12 +1,12 @@
 interface AgentConfig {
     prompt: string;
-    llm_model: string;
-    public_desc: string;
+    llmModel: string;
+    publicDesc: string;
 }
 declare class Agent {
     private prompt;
-    private llm_model;
-    private public_desc;
+    private llmModel;
+    private publicDesc;
     constructor(config: AgentConfig);
     getPrompt(): string;
     getLlmModel(): string;

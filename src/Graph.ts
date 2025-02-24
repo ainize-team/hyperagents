@@ -1,4 +1,4 @@
-import Agent from "./agent";
+import Agent from "./Agent";
 
 interface EdgeData {
   to: string;
@@ -9,14 +9,21 @@ interface EdgeData {
 class Graph {
   private node: Map<string, Agent>;
   private edge: Map<string, Map<string, EdgeData>>;
-  private entry_point?: string;
+  private entryPoint?: string;
   constructor() {
     this.node = new Map();
     this.edge = new Map();
   }
 
+  getEntryPoint() {
+    if (!this.entryPoint) {
+      throw new Error("Entry point not set");
+    }
+    return this.entryPoint;
+  }
+
   setEntryPoint(name: string) {
-    this.entry_point = name;
+    this.entryPoint = name;
   }
 
   addAgentNode(nodeconfig: {agent: Agent, name: string}) {
@@ -43,5 +50,6 @@ class Graph {
   getEdge(from: string, to: string) {
     return this.edge.get(from)?.get(to);
   }
+
 }
 export default Graph;
