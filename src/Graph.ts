@@ -15,8 +15,8 @@ class Graph {
     this.edge = new Map();
   }
 
-  addAgentNode(nodeconfig: {agent: Agent, name: string}) {
-    this.node.set(nodeconfig.name, nodeconfig.agent);
+  addAgentNode(nodeconfig: {agent?: Agent, name: string}) {
+    this.node.set(nodeconfig.name, nodeconfig.agent? nodeconfig.agent);
   }
   
   addEdge(edgeConfig: {from: string, to: string, prompt: string, bandwith: number}) {
@@ -31,8 +31,13 @@ class Graph {
     return this.node.get(name);
   }
 
-  getEdge(from: string) {
-    return this.edge.get(from);
+  getEdges(from: string) {
+    const edges = this.edge.get(from);
+    return Array.from(edges?.values() || []);
+  }
+
+  getEdge(from: string, to: string) {
+    return this.edge.get(from)?.get(to);
   }
 }
 export default Graph;

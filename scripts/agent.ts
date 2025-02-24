@@ -23,6 +23,13 @@ const victoria = new Agent({
 
 const graph = new Graph();
 
+graph.addAgentNode({agent: max, name: "max"});
+graph.addAgentNode({agent: victoria, name: "victoria"});
+
+graph.addEdge({from: "max", to: "victoria", prompt: "max write a first draft of an article.", bandwith: 1});
+
+const edges = graph.getEdges("max");
+console.log(edges);
 
 
 
