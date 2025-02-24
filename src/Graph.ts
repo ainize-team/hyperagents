@@ -4,7 +4,6 @@ interface EdgeData {
   to: string;
   from: string;
   prompt: string;
-  bandwith: number;
 }
 
 class Graph {
@@ -24,7 +23,7 @@ class Graph {
     this.node.set(nodeconfig.name, nodeconfig.agent);
   }
   
-  addEdge(edgeConfig: {from: string, to: string, prompt: string, bandwith: number}) {
+  addEdge(edgeConfig: {from: string, to: string, prompt: string}) {
     if(this.edge.get(edgeConfig.from)){
       this.edge.get(edgeConfig.from)?.set(edgeConfig.to, edgeConfig);
     } else {

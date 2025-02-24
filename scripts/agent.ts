@@ -1,5 +1,5 @@
-import Agent from "../src/agent";
-import Graph from "../src/graph";
+import Agent from "../src/Agent";
+import Graph from "../src/Graph";
 import { LLMType } from "../src/type";
 import dotenv from "dotenv";
 dotenv.config();
@@ -26,7 +26,7 @@ const graph = new Graph();
 graph.addAgentNode({agent: max, name: "max"});
 graph.addAgentNode({agent: victoria, name: "victoria"});
 
-graph.addEdge({from: "max", to: "victoria", prompt: "max write a first draft of an article.", bandwith: 1});
+graph.addEdge({from: "max", to: "victoria", prompt: "max write a first draft of an article."});
 
 const edges = graph.getEdges("max");
 console.log(edges);
