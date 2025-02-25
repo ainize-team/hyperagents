@@ -27,8 +27,10 @@ class GraphTask {
 
   async runTask(input: string) {
     this.memory.add({
+      id: "USER_INPUT",
       author: "user",
       content: input,
+      timestamp: Date.now(),
     });
     let edge = this.graph.getEntryPoint();
     while (true) {
@@ -40,10 +42,6 @@ class GraphTask {
         return messages[messages.length - 1].content;
       }
       edge = edges[0];
-      const messages = await this.memory.load();
-      console.log("########################");
-      console.log("Edge: ", edge);
-      console.log("Memory: ", messages);
     }
   }
 }

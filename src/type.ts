@@ -9,6 +9,8 @@ export enum MemoryType {
 }
 
 export interface Message {
+  id: string;
+  timestamp?: number;
   author: string;
   content: string;
 }

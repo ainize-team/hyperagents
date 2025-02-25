@@ -56,23 +56,22 @@ class Agent {
     return this.publicDesc;
   }
 
-  public async run(input: string): Promise<string> {
-    const messages = await this.memory.load();
-    const lastTenMessages = messages.slice(-10);
-    const prompt =
-      lastTenMessages.map((msg) => msg.content).join("\n") + "\n" + input;
-    const output = await this.executeLLM(prompt);
+  public async run(input: string, resultMemoryId?: string): Promise<string> {
+    const messages = await this.memory.loadMap();
+    const processedInput = input.replace(/\^(.*?)\^/g, (_, memoryId) => {
+      const memoryData = messages.get(memoryId);
+      return memoryData?.content || memoryId;
+    });
+    const output = await this.executeLLM(processedInput);
     this.memory.add({
+      id: resultMemoryId || this.name + "-" + Date.now(),
+      timestamp: Date.now(),
       author: this.name,
       content: output,
     });
     console.log("########################");
     console.log(this.name);
-    console.log("Last 10 messages:");
-    lastTenMessages.forEach((msg, i) => {
-      console.log(`${i + 1}. ${msg.author}: ${msg.content}`);
-    });
-    console.log("Output:", output);
+    console.log("processedInput: ", processedInput);
     return output;
   }
 
