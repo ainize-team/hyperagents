@@ -11,22 +11,22 @@ const researcher  = Agent.fromConfigFile("researcher.json", {
 });
 
 const reviewer = Agent.fromConfigFile("reviewer.json", {
-  llmEndpoint: process.env.OPENAI_API_KEY!,
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 });
 
 const reporter = Agent.fromConfigFile("reporter.json", {
-  llmEndpoint: process.env.OPENAI_API_KEY!,
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 });
 
 const director = Agent.fromConfigFile("director.json", {
-  llmEndpoint: process.env.OPENAI_API_KEY!,
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 });
 
 const publisher = Agent.fromConfigFile("publisher.json", {
-  llmEndpoint: process.env.OPENAI_API_KEY!,
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 }); 
 
