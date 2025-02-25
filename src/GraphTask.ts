@@ -16,10 +16,18 @@ class GraphTask {
 
   async exportMemory(): Promise<string> {
     const messages = await this.memory.load();
-    let markdown = "# Conversation Export\n\n";
+    let markdown = "# 대화 내보내기\n\n";
 
     for (const message of messages) {
-      markdown += `## ${message.author}\n\n${message.content}\n\n`;
+      // author를 더 강조하고 명확하게 표시
+      markdown += `### 😀 ${message.author}\n\n`;
+
+      // content를 인용 블록(>)으로 감싸서 시각적으로 구분
+      // 각 줄마다 > 를 추가하여 여러 줄의 content도 인용 블록으로 처리
+      const contentLines = message.content.split("\n");
+      const quotedContent = contentLines.map((line) => `> ${line}`).join("\n");
+
+      markdown += `${quotedContent}\n\n---\n\n`; // 구분선 추가
     }
 
     return markdown;
