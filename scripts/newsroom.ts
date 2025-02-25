@@ -35,7 +35,7 @@ const graph = new Graph();
 graph.addAgentNode({ agent: researcher, nodeId: "researcher-1" });
 graph.addAgentNode({ agent: reviewer, nodeId: "reviewer-1" });
 graph.addAgentNode({ agent: reporter, nodeId: "reporter-1" });
-graph.addAgentNode({ agent: director, nodeId: "reviewer-2" });
+graph.addAgentNode({ agent: reviewer, nodeId: "reviewer-2" });
 graph.addAgentNode({ agent: reporter, nodeId: "reporter-2" });
 graph.addAgentNode({ agent: director, nodeId: "director-1" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher-1" });
