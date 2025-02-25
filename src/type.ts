@@ -13,18 +13,11 @@ export interface Message {
   content: string;
 }
 
-export interface Memory {
-  init(): Promise<void>;
-  add(data: Message): Promise<void>;
-  load(): Promise<Array<Message>>;
-}
-
-export interface AgentConfigs {
-  name: string;
-  systemPrompt: string;
-  llm: LLMType;
-  publicDesc: string;
-  llmEndpoint?: string;
-  llmApiKey: string;
-  memoryType: MemoryType;
+export function getEnumKeyByValue<T extends { [key: string]: string | number }>(
+  enumObj: T,
+  value: string | number
+): keyof T | undefined {
+  return Object.keys(enumObj).find(
+    key => enumObj[key] === value
+  ) as keyof T | undefined;
 }

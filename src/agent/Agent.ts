@@ -1,13 +1,13 @@
-import axios from "axios";
-import { LLMType, Memory, MemoryType, AgentConfigs } from "./type";
-import InMemoryMemory from "./InMemoryMemory";
-import { ILLMClient } from "./llm/ILLMClient";
-import { GoogleLLMClient } from "./llm/GoogleLLMClient";
-import { AzureLLMClient } from "./llm/AzureLLMClient";
-
+import { LLMType, MemoryType} from "../type";
+import InMemoryMemory from "../memory/InMemoryMemory";
+import { ILLMClient } from "../llm/ILLMClient";
+import { GoogleLLMClient } from "../llm/GoogleLLMClient";
+import { AzureLLMClient } from "../llm/AzureLLMClient";
+import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
+import { Memory } from "../memory";
 class Agent {
   private name: string;
-  private prompt: string;
+  private systemPrompt: string;
   private llm: LLMType;
   private publicDesc: string;
   private llmEndpoint?: string;
@@ -17,7 +17,7 @@ class Agent {
   private llmClient: ILLMClient;
   constructor(config: AgentConfigs) {
     this.name = config.name;
-    this.prompt = config.systemPrompt;
+    this.systemPrompt = config.systemPrompt;
     this.llm = config.llm;
     this.publicDesc = config.publicDesc;
     this.llmEndpoint = config.llmEndpoint;
@@ -28,15 +28,23 @@ class Agent {
     } else {
       throw new Error("Memory type not supported");
     }
-    this.llmClient = this.createLLMClient(config);
+    this.llmClient = this.createLLMClient();
+  }
+
+  static fromConfigFile(configPath: string, overrides?: Partial<AgentConfigs>): Agent {
+    const config = loadAgentConfig(configPath);
+    return new Agent({
+      ...config,
+      ...overrides
+    });
   }
 
   public getName() {
     return this.name;
   }
 
-  public getPrompt() {
-    return this.prompt;
+  public getSystemPrompt() {
+    return this.systemPrompt;
   }
 
   public getLlm() {
@@ -67,24 +75,22 @@ class Agent {
     return output;
   }
 
-  private createLLMClient(config: AgentConfigs): ILLMClient {
-    switch (config.llm) {
+  private createLLMClient(): ILLMClient {
+    switch (this.llm) {
       case LLMType.GEMINI_1_5_FLASH:
-        if (!config.llmApiKey)
+        if (!this.llmApiKey)
           throw new Error("API key is required for Google LLM");
         return new GoogleLLMClient(
-          config.llmApiKey,
-          config.llm,
-          config.systemPrompt
+          this.llmApiKey,
+          this.llm
         );
       case LLMType.gpt4o:
-        if (!config.llmEndpoint || !config.llmApiKey) {
+        if (!this.llmEndpoint || !this.llmApiKey) {
           throw new Error("Endpoint and API key are required for Azure LLM");
         }
         return new AzureLLMClient(
-          config.llmEndpoint,
-          config.llmApiKey,
-          config.systemPrompt
+          this.llmEndpoint,
+          this.llmApiKey
         );
       default:
         throw new Error("Unsupported LLM type");
@@ -93,7 +99,7 @@ class Agent {
 
   async executeLLM(input: string): Promise<string> {
     // 예시: 입력을 기반으로 LLM 호출
-    return await this.llmClient.generateContent(input);
+    return await this.llmClient.generateContent(this.systemPrompt,input);
   }
 }
 

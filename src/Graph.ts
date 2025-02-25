@@ -1,5 +1,4 @@
-import { join } from "path";
-import Agent from "./Agent";
+import Agent from "./agent/Agent";
 
 interface EdgeData {
   to: string;

@@ -1,5 +1,5 @@
 import Graph from "./Graph";
-import { Memory } from "./type";
+import { Memory } from "./memory";
 
 class GraphTask {
   private graph: Graph;

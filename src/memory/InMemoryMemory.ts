@@ -1,4 +1,5 @@
-import { Memory, Message } from "./type";
+import { Memory } from ".";
+import { Message } from "../type";
 
 class InMemoryMemory implements Memory {
   private static instance: InMemoryMemory;

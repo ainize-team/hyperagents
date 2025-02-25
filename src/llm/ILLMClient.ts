@@ -1,4 +1,4 @@
 // ILLMClient.ts
 export interface ILLMClient {
-  generateContent(prompt: string): Promise<string>;
+  generateContent(systemPrompt: string, prompt: string): Promise<string>;
 }
