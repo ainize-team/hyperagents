@@ -5,6 +5,7 @@ import { GoogleLLMClient } from "../llm/GoogleLLMClient";
 import { AzureLLMClient } from "../llm/AzureLLMClient";
 import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
 import { Memory } from "../memory";
+
 class Agent {
   private name: string;
   private systemPrompt: string;
