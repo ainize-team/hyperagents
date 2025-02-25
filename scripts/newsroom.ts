@@ -12,8 +12,7 @@ const researcher = Agent.fromConfigFile("researcher.json", {
 });
 
 const reviewer = Agent.fromConfigFile("reviewer.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
+  llmApiKey: process.env.ORA_API_KEY!,
 });
 
 const reporter = Agent.fromConfigFile("reporter.json", {

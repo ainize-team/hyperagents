@@ -5,6 +5,7 @@ import { GoogleLLMClient } from "../llm/GoogleLLMClient";
 import { AzureLLMClient } from "../llm/AzureLLMClient";
 import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
 import { Memory } from "../memory";
+import { OraLLMClient } from "../llm/OraLLMClient";
 
 class Agent {
   private name: string;
@@ -84,11 +85,16 @@ class Agent {
         if (!this.llmApiKey)
           throw new Error("API key is required for Google LLM");
         return new GoogleLLMClient(this.llmApiKey, this.llm);
-      case LLMType.gpt4o:
+      case LLMType.GPT4O:
         if (!this.llmEndpoint || !this.llmApiKey) {
           throw new Error("Endpoint and API key are required for Azure LLM");
         }
         return new AzureLLMClient(this.llmEndpoint, this.llmApiKey);
+      case LLMType.ORA_DEEPSEEK_V3:
+        if (!this.llmApiKey) {
+          throw new Error("API key is required for Ora LLM");
+        }
+        return new OraLLMClient(this.llmApiKey, this.llm);
       default:
         throw new Error("Unsupported LLM type");
     }
