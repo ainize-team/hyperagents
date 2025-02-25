@@ -20,7 +20,9 @@ class GraphTask {
 
     for (const message of messages) {
       // author를 더 강조하고 명확하게 표시
-      markdown += `### 😀 ${message.author}\n\n`;
+      markdown += `### 😀 ${message.author}\n\n
+### ${message.id}\n\n
+### ${message.timestamp}\n\n`;
 
       // content를 인용 블록(>)으로 감싸서 시각적으로 구분
       // 각 줄마다 > 를 추가하여 여러 줄의 content도 인용 블록으로 처리
@@ -43,7 +45,7 @@ class GraphTask {
     let edge = this.graph.getEntryPoint();
     while (true) {
       const agent = this.graph.getNode(edge.to);
-      await agent.run(edge.prompt);
+      await agent.run(edge.prompt, edge.memoryId);
       const edges = this.graph.getEdges(edge.to);
       if (edges.length == 0) {
         const messages = await this.memory.load();

@@ -46,7 +46,11 @@ graph.addEdge({
   to: "reviewer-1",
   prompt: `Give reporter a news article guide in a casual, informal tone, as if speaking to a junior colleague. Keep it short, like giving quick feedback to a subordinate.
 Use this tone as a reference: Researcher, I checked out your research—good work! + Reporter's guide
-The article guide should be a single paragraph, written in a natural, conversational style without bullet points. Focus on explaining the key issue (what happened) and the future outlook (how this issue might impact things going forward).`,
+The article guide should be a single paragraph, written in a natural, conversational style without bullet points. Focus on explaining the key issue (what happened) and the future outlook (how this issue might impact things going forward).
+
+<Market Research>
+^MARKET_RESEARCH^
+`,
   memoryId: "ARTICLE_GUIDE",
 });
 
@@ -128,19 +132,28 @@ Then, APPROVE the article, explaining your reasoning in a single paragraph, usin
 Do not use bullet points.
 
 <Final Article>
-^Final Article^
+^FINAL_ARTICLE^
 `,
 });
 
 graph.addEdge({
   from: "director-1",
   to: "publisher-1",
-  prompt: "Convert the article to HTML format.",
+  prompt: `Convert the article to HTML format.
+  
+<Final Article>
+^FINAL_ARTICLE^
+`,
 });
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
 graph.setEntryPoint(
   "researcher-1",
-  "Find relevant materials and include the content of <Materials> in your report to the Reviewer."
+  `Find relevant materials and include the content of <Materials> in your report to the Reviewer.
+
+<Materials>
+^USER_INPUT^
+`,
+  "MARKET_RESEARCH"
 );
 
 const task = new GraphTask(graph, InMemoryMemory.getInstance());

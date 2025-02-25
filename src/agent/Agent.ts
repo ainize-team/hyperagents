@@ -1,4 +1,4 @@
-import { LLMType, MemoryType} from "../type";
+import { LLMType, MemoryType } from "../type";
 import InMemoryMemory from "../memory/InMemoryMemory";
 import { ILLMClient } from "../llm/ILLMClient";
 import { GoogleLLMClient } from "../llm/GoogleLLMClient";
@@ -32,11 +32,14 @@ class Agent {
     this.llmClient = this.createLLMClient();
   }
 
-  static fromConfigFile(configPath: string, overrides?: Partial<AgentConfigs>): Agent {
+  static fromConfigFile(
+    configPath: string,
+    overrides?: Partial<AgentConfigs>
+  ): Agent {
     const config = loadAgentConfig(configPath);
     return new Agent({
       ...config,
-      ...overrides
+      ...overrides,
     });
   }
 
@@ -80,18 +83,12 @@ class Agent {
       case LLMType.GEMINI_1_5_FLASH:
         if (!this.llmApiKey)
           throw new Error("API key is required for Google LLM");
-        return new GoogleLLMClient(
-          this.llmApiKey,
-          this.llm
-        );
+        return new GoogleLLMClient(this.llmApiKey, this.llm);
       case LLMType.gpt4o:
         if (!this.llmEndpoint || !this.llmApiKey) {
           throw new Error("Endpoint and API key are required for Azure LLM");
         }
-        return new AzureLLMClient(
-          this.llmEndpoint,
-          this.llmApiKey
-        );
+        return new AzureLLMClient(this.llmEndpoint, this.llmApiKey);
       default:
         throw new Error("Unsupported LLM type");
     }
@@ -99,7 +96,7 @@ class Agent {
 
   async executeLLM(input: string): Promise<string> {
     // 예시: 입력을 기반으로 LLM 호출
-    return await this.llmClient.generateContent(this.systemPrompt,input);
+    return await this.llmClient.generateContent(this.systemPrompt, input);
   }
 }
 
