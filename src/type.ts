@@ -15,11 +15,12 @@ export interface Message {
 
 export interface Memory {
   init(): Promise<void>;
-  add(data:Message): Promise<void>;
+  add(data: Message): Promise<void>;
   load(): Promise<Array<Message>>;
 }
 
 export interface AgentConfigs {
+  name: string;
   systemPrompt: string;
   llm: LLMType;
   publicDesc: string;

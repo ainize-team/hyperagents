@@ -25,15 +25,20 @@ class Graph {
   }
 
   setEntryPoint(name: string, prompt: string) {
-    this.edge.set(this.ENTRY_POINT_KEY, new Map([[name, {to: name, from: this.ENTRY_POINT_KEY, prompt: prompt}]]));
+    this.edge.set(
+      this.ENTRY_POINT_KEY,
+      new Map([
+        [name, { to: name, from: this.ENTRY_POINT_KEY, prompt: prompt }],
+      ])
+    );
   }
 
-  addAgentNode(nodeconfig: {agent: Agent, name: string}) {
-    this.node.set(nodeconfig.name, nodeconfig.agent);
+  addAgentNode(nodeconfig: { agent: Agent; nodeId: string }) {
+    this.node.set(nodeconfig.nodeId, nodeconfig.agent);
   }
-  
-  addEdge(edgeConfig: {from: string, to: string, prompt: string}) {
-    if(this.edge.get(edgeConfig.from)){
+
+  addEdge(edgeConfig: { from: string; to: string; prompt: string }) {
+    if (this.edge.get(edgeConfig.from)) {
       this.edge.get(edgeConfig.from)?.set(edgeConfig.to, edgeConfig);
     } else {
       this.edge.set(edgeConfig.from, new Map([[edgeConfig.to, edgeConfig]]));
@@ -41,7 +46,7 @@ class Graph {
   }
 
   getNode(name: string) {
-    const agent  = this.node.get(name);
+    const agent = this.node.get(name);
     if (!agent) {
       throw new Error(`Agent ${name} not found`);
     }
@@ -56,6 +61,5 @@ class Graph {
   getEdge(from: string, to: string) {
     return this.edge.get(from)?.get(to);
   }
-
 }
 export default Graph;

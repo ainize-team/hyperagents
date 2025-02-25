@@ -1,11 +1,12 @@
-import axios from 'axios';
-import { LLMType, Memory, MemoryType, AgentConfigs } from './type';
-import InMemoryMemory from './InMemoryMemory';
+import axios from "axios";
+import { LLMType, Memory, MemoryType, AgentConfigs } from "./type";
+import InMemoryMemory from "./InMemoryMemory";
 import { ILLMClient } from "./llm/ILLMClient";
 import { GoogleLLMClient } from "./llm/GoogleLLMClient";
 import { AzureLLMClient } from "./llm/AzureLLMClient";
 
 class Agent {
+  private name: string;
   private prompt: string;
   private llm: LLMType;
   private publicDesc: string;
@@ -15,6 +16,7 @@ class Agent {
   private memory: Memory;
   private llmClient: ILLMClient;
   constructor(config: AgentConfigs) {
+    this.name = config.name;
     this.prompt = config.systemPrompt;
     this.llm = config.llm;
     this.publicDesc = config.publicDesc;
@@ -23,10 +25,14 @@ class Agent {
     this.memoryType = config.memoryType;
     if (this.memoryType === MemoryType.inMemory) {
       this.memory = InMemoryMemory.getInstance();
-    }else {
+    } else {
       throw new Error("Memory type not supported");
     }
     this.llmClient = this.createLLMClient(config);
+  }
+
+  public getName() {
+    return this.name;
   }
 
   public getPrompt() {
@@ -40,11 +46,25 @@ class Agent {
   public getPublicDesc() {
     return this.publicDesc;
   }
-  
 
   public async run(input: string): Promise<string> {
-
-    return "hi";
+    const messages = await this.memory.load();
+    const lastTenMessages = messages.slice(-10);
+    const prompt =
+      lastTenMessages.map((msg) => msg.content).join("\n") + "\n" + input;
+    const output = await this.executeLLM(prompt);
+    this.memory.add({
+      author: this.name,
+      content: output,
+    });
+    console.log("########################");
+    console.log(this.name);
+    console.log("Last 10 messages:");
+    lastTenMessages.forEach((msg, i) => {
+      console.log(`${i + 1}. ${msg.author}: ${msg.content}`);
+    });
+    console.log("Output:", output);
+    return output;
   }
 
   private createLLMClient(config: AgentConfigs): ILLMClient {

@@ -39,10 +39,6 @@ export class GoogleLLMClient implements ILLMClient {
       { apiVersion: "v1beta" }
     );
     const result = await model.generateContent(this.systemPrompt + prompt);
-    console.log(
-      "Grounding metadata:",
-      result.response.candidates?.[0]?.groundingMetadata
-    );
     return result.response.text();
   }
 }
