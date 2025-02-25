@@ -24,11 +24,11 @@ class Graph {
     return entryPoint[0];
   }
 
-  setEntryPoint(name: string, prompt: string) {
+  setEntryPoint(name: string, prompt: string, memoryId?: string) {
     this.edge.set(
       this.ENTRY_POINT_KEY,
       new Map([
-        [name, { to: name, from: this.ENTRY_POINT_KEY, prompt: prompt }],
+        [name, { to: name, from: this.ENTRY_POINT_KEY, prompt: prompt, memoryId: memoryId? memoryId : undefined}],
       ])
     );
   }
