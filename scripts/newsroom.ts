@@ -47,6 +47,7 @@ graph.addEdge({
   prompt: `Give reporter a news article guide in a casual, informal tone, as if speaking to a junior colleague. Keep it short, like giving quick feedback to a subordinate.
 Use this tone as a reference: Researcher, I checked out your research—good work! + Reporter's guide
 The article guide should be a single paragraph, written in a natural, conversational style without bullet points. Focus on explaining the key issue (what happened) and the future outlook (how this issue might impact things going forward).`,
+  memoryId: "ARTICLE_GUIDE",
 });
 
 graph.addEdge({
@@ -65,7 +66,14 @@ graph.addEdge({
 - Lead: A single, condensed sentence summarizing the article.  
 - Body: Write in a continuous flow without subheadings or bullet points.  
 - Market Information: If relevant <Market Data> is available, briefly summarize it at the end. If not, don't mention it.
+
+<Market Research>
+^MARKET_RESEARCH^
+
+<Article Guide>
+^ARTICLE_GUIDE^
 `,
+  memoryId: "ARTICLE_DRAFT",
 });
 
 graph.addEdge({
@@ -77,7 +85,15 @@ Give your feedback in a single paragraph with a sharp and professional tone, as 
 
 Focus especially on the title, evaluating its engagement, clarity, conciseness, SEO strength, and originality. Check if any key attention-grabbing elements from the <Original Source>, such as numbers, quotes, or witty phrases, were omitted, and ensure the content remains timely and relevant.
 
-If subheadings were used, tell them not to use them.`,
+If subheadings were used, tell them not to use them.
+
+<Original Source>
+^USER_INPUT^
+
+<Article Draft>
+^ARTICLE_DRAFT^
+`,
+  memoryId: "MANAGER_FEEDBACK",
 });
 
 graph.addEdge({
@@ -86,7 +102,15 @@ graph.addEdge({
   prompt: `First, respond as if speaking to a superior, confirming that you will apply the Feedback in a playful and cute manner, similar to a cheerful young woman in her 20s. Use a tone like:
 "Got it~! I’ll fix it right away! 😊"
 
-Then, apply the Feedback to the Article, ensuring that the original article length remains unchanged while making the necessary improvements.`,
+Then, apply the Feedback to the Article, ensuring that the original article length remains unchanged while making the necessary improvements.
+
+<Article Draft>
+^ARTICLE_DRAFT^
+
+<Manager Feedback>
+^MANAGER_FEEDBACK^
+`,
+  memoryId: "FINAL_ARTICLE",
 });
 
 graph.addEdge({
@@ -101,7 +125,11 @@ Assess:
 
 Then, APPROVE the article, explaining your reasoning in a single paragraph, using a conversational tone like: "This article is approved." or "~ is well-written."  
 
-Do not use bullet points.`,
+Do not use bullet points.
+
+<Final Article>
+^Final Article^
+`,
 });
 
 graph.addEdge({
