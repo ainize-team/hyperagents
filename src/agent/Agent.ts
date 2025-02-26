@@ -7,6 +7,7 @@ import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
 import { Memory } from "../memory";
 
 class Agent {
+  // 
   private name: string;
   private systemPrompt: string;
   private llm: LLMType;
@@ -14,8 +15,12 @@ class Agent {
   private llmEndpoint?: string;
   private llmApiKey?: string;
   private memoryType: MemoryType;
+
+  // objects
   private memory: Memory;
   private llmClient: ILLMClient;
+
+  
   constructor(config: AgentConfigs) {
     this.name = config.name;
     this.systemPrompt = config.systemPrompt;
@@ -63,16 +68,21 @@ class Agent {
       return memoryData?.content || memoryId;
     });
     const output = await this.executeLLM(processedInput);
+    const processedOutput = output.replace(/%function_call\((.*?)\)%/g, (_, functionCall) => {
+      functionCall = JSON.parse(functionCall);
+      this.functionHandle(functionCall);
+      return "";
+    });
     this.memory.add({
-      id: resultMemoryId || this.name + "-" + Date.now(),
-      timestamp: Date.now(),
+      id: resultMemoryId ? resultMemoryId : this.name + "-" + Date.now(),
+      timestamp: Date.now(), 
       author: this.name,
-      content: output,
+      content: processedOutput,
     });
     console.log("########################");
     console.log(this.name);
     console.log("processedInput: ", processedInput);
-    return output;
+    return processedOutput;
   }
 
   private createLLMClient(): ILLMClient {
@@ -100,6 +110,14 @@ class Agent {
   async executeLLM(input: string): Promise<string> {
     // 예시: 입력을 기반으로 LLM 호출
     return await this.llmClient.generateContent(this.systemPrompt,input);
+  }
+  private functionHandle(functionCall: any): void {
+    if(functionCall.name === "vote") {
+      this.vote(functionCall.proposal, functionCall.result);
+    }
+  }
+  private async vote(proposal: string, result: boolean): Promise<void> {
+    console.log("vote: ", proposal, result);
   }
 }
 
