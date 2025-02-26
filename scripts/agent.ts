@@ -8,7 +8,7 @@ dotenv.config();
 
 // 1. 요청받은 내용에 대해 조사하는 Researcher: DATA DOG
 const dataDog = Agent.fromConfigFile("dataDog.json", {
-  llmApiKey: process.env.GOOGLE_API_KEY!,
+  llmApiKey: process.env.GOOGLE_API_KEY!
 });
 
 // 2. 프로젝트 자체 + 최신 이슈를 분석하는 Researcher: GOSSIP FOX

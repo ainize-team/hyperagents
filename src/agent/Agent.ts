@@ -1,4 +1,4 @@
-import { LLMType, MemoryType } from "../type";
+import { LLMType, MemoryType, PrivateKeyType } from "../type";
 import InMemoryMemory from "../memory/InMemoryMemory";
 import { ILLMClient } from "../llm/ILLMClient";
 import { GoogleLLMClient } from "../llm/GoogleLLMClient";
@@ -16,7 +16,7 @@ class Agent {
   private llmEndpoint?: string;
   private llmApiKey?: string;
   private memoryType: MemoryType;
-
+  private privateKey?: Map<PrivateKeyType, string>;
   // objects
   private memory: Memory;
   private llmClient: ILLMClient;
@@ -30,6 +30,7 @@ class Agent {
     this.llmEndpoint = config.llmEndpoint;
     this.llmApiKey = config.llmApiKey;
     this.memoryType = config.memoryType;
+    this.privateKey = config.privateKey;
     if (this.memoryType === MemoryType.inMemory) {
       this.memory = InMemoryMemory.getInstance();
     } else {
@@ -71,21 +72,21 @@ class Agent {
       const memoryData = messages.get(memoryId);
       return memoryData?.content || memoryId;
     });
+    console.log("########################");
+    console.log(this.name);
+    console.log("processedInput: ", processedInput);
     const output = await this.executeLLM(processedInput);
-    const processedOutput = output.replace(/%function_call\((.*?)\)%/g, (_, functionCall) => {
-      functionCall = JSON.parse(functionCall);
+    const processedOutput = output.replace(/%function_call\((.*?)\)%/g, (_, functionCall) => { 
       this.functionHandle(functionCall);
       return "";
     });
+    console.log("processedOutput: ", processedOutput);
     this.memory.add({
       id: resultMemoryId ? resultMemoryId : this.name + "-" + Date.now(),
       timestamp: Date.now(), 
       author: this.name,
       content: processedOutput,
     });
-    console.log("########################");
-    console.log(this.name);
-    console.log("processedInput: ", processedInput);
     return processedOutput;
   }
 
@@ -114,13 +115,21 @@ class Agent {
     // 예시: 입력을 기반으로 LLM 호출
     return await this.llmClient.generateContent(this.systemPrompt, input);
   }
-  private functionHandle(functionCall: any): void {
-    if(functionCall.name === "vote") {
-      this.vote(functionCall.proposal, functionCall.result);
+  private functionHandle(functionCall: string): void {
+    const functionCallArgs = functionCall.split(",").map(arg => arg.trim());
+    if(functionCallArgs[0] === "vote") {
+      if (functionCallArgs.length === 3) {
+        this.vote(functionCallArgs[1], functionCallArgs[2]);
+      } else {
+        throw new Error("Invalid function arguments");
+      }
     }
   }
-  private async vote(proposal: string, result: boolean): Promise<void> {
-    console.log("vote: ", proposal, result);
+  private async vote(proposalId: string, result: string): Promise<void> {
+    if(this.privateKey && this.privateKey.has(PrivateKeyType.ETH)) {
+      const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
+      console.log(`**agent ${this.name} voted proposal:${proposalId} ${result} with ethPrivateKey:${ethPrivateKey?.slice(0, 6) + "..."} `);
+    }
   }
 }
 

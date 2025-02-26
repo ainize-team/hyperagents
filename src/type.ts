@@ -8,6 +8,12 @@ export enum MemoryType {
   inMemory = "InMemory",
 }
 
+export enum PrivateKeyType {
+  ETH = "ETH",
+  AIN = "AIN",
+}
+
+
 export interface Message {
   id: string;
   timestamp?: number;

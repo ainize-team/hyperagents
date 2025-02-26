@@ -4,11 +4,16 @@ import Graph from "../src/Graph";
 import InMemoryMemory from "../src/memory/InMemoryMemory";
 import GraphTask from "../src/GraphTask";
 import fs from "fs";
+import { PrivateKeyType } from "../src/type";
 dotenv.config();
 
 // 1. 요청받은 내용에 대해 조사하는 Researcher:
 const researcher = Agent.fromConfigFile("researcher.json", {
   llmApiKey: process.env.GOOGLE_API_KEY!,
+  privateKey: new Map([
+    [PrivateKeyType.ETH, process.env.RESEARCHER_ETH_PRIVATE_KEY!],
+    [PrivateKeyType.AIN, process.env.RESEARCHER_AIN_PRIVATE_KEY!]
+  ]),
 });
 
 const reviewer = Agent.fromConfigFile("reviewer.json", {

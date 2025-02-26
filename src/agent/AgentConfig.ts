@@ -1,4 +1,4 @@
-import { getEnumKeyByValue, LLMType, MemoryType } from "../type";
+import { getEnumKeyByValue, LLMType, MemoryType, PrivateKeyType } from "../type";
 import fs from 'fs';
 import path from 'path';
 
@@ -10,6 +10,7 @@ export interface AgentConfigs {
   llmApiKey?: string;
   llmEndpoint?: string;
   memoryType: MemoryType;
+  privateKey?: Map<PrivateKeyType, string>;
 }
 
 export function isAgentConfigs(obj: unknown): obj is AgentConfigs {
@@ -37,6 +38,18 @@ export function loadAgentConfig(fileName: string): AgentConfigs {
       } else {
         throw new Error(`Invalid memory type: ${config.memoryType}`);
       }
+    }
+    if (config.privateKey) {
+      const privateKey = new Map<PrivateKeyType, string>();
+      for (const [key, value] of Object.entries(config.privateKey)) {
+        const privateKeyTypeKey = getEnumKeyByValue(PrivateKeyType, key);
+        if (privateKeyTypeKey) {
+          privateKey.set(PrivateKeyType[privateKeyTypeKey], value as string);
+        } else {
+          throw new Error(`Invalid private key type: ${key}`);
+        }
+      }
+      config.privateKey = privateKey;
     }
     
     if (config.llm) {
