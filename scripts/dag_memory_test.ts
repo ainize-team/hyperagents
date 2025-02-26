@@ -1,4 +1,4 @@
-import { AINetworkDAGMemory } from "../src/AINetworkDAGMemory";
+import { AINetworkDAGMemory } from "../src/memory/AINetworkDAGMemory";
 import { Message } from "../src/type";
 import { v4 as uuidv4 } from "uuid";
 
