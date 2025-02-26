@@ -98,17 +98,17 @@ export class AINetworkDAGMemory implements Memory {
         console.log(`AINetworkDAGMemory: Added message with CID: ${this.rootCid}`);
         
         // Update the memory index with the new root CID
-        await this.client.add({
-          cid: this.memoryId,
-          message: JSON.stringify({
-            rootCid: this.rootCid,
-            previousRootCid: oldRootCid,
-            memoryId: this.memoryId,
-            updatedAt: Date.now()
-          })
-        });
+        // await this.client.add({
+        //   cid: this.memoryId,
+        //   message: JSON.stringify({
+        //     rootCid: this.rootCid,
+        //     previousRootCid: oldRootCid,
+        //     memoryId: this.memoryId,
+        //     updatedAt: Date.now()
+        //   })
+        // });
         
-        console.log(`AINetworkDAGMemory: Updated memory index for ID "${this.memoryId}"`);
+        // console.log(`AINetworkDAGMemory: Updated memory index for ID "${this.memoryId}"`);
         
       } catch (error) {
         console.error('AINetworkDAGMemory: Error adding message:', error);
