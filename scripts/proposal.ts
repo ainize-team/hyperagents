@@ -35,7 +35,7 @@ const reviewer = Agent.fromConfigFile("reviewer.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REVIEWER_ETH_PRIVATE_KEY!]
+    [PrivateKeyType.ETH, process.env.REVIEWER_ETH_PRIVATE_KEY!],
   ]),
 });
 
@@ -43,7 +43,7 @@ const reporter = Agent.fromConfigFile("reporter.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REPORTER_ETH_PRIVATE_KEY!]
+    [PrivateKeyType.ETH, process.env.REPORTER_ETH_PRIVATE_KEY!],
   ]),
 });
 
@@ -51,7 +51,7 @@ const director = Agent.fromConfigFile("director.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.DIRECTOR_ETH_PRIVATE_KEY!]
+    [PrivateKeyType.ETH, process.env.DIRECTOR_ETH_PRIVATE_KEY!],
   ]),
 });
 
@@ -60,33 +60,54 @@ const publisher = Agent.fromConfigFile("publisher.json", {
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.PUBLISHER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.AIN, process.env.PUBLISHER_AIN_PRIVATE_KEY!]
+    [PrivateKeyType.AIN, process.env.PUBLISHER_AIN_PRIVATE_KEY!],
   ]),
 });
 
 const graph = new Graph();
-graph.addAgentNode({agent: researcher, nodeId: "researcher"});
-graph.addAgentNode({agent: reporter, nodeId: "reporter"});
-graph.addAgentNode({agent: reviewer, nodeId: "reviewer"});
-graph.addAgentNode({agent: director, nodeId: "director"});
-graph.addAgentNode({agent: publisher, nodeId: "publisher"});
+graph.addAgentNode({ agent: researcher, nodeId: "researcher" });
+graph.addAgentNode({ agent: reporter, nodeId: "reporter" });
+graph.addAgentNode({ agent: reviewer, nodeId: "reviewer" });
+graph.addAgentNode({ agent: director, nodeId: "director" });
+graph.addAgentNode({ agent: publisher, nodeId: "publisher" });
 
-graph.addEdge({from: "researcher", to: "reporter", prompt: PROPOSAL_VOTE_PROMPT, memoryId: "researcher-reporter"});
-graph.addEdge({from: "reporter", to: "reviewer", prompt: PROPOSAL_VOTE_PROMPT, memoryId: "reporter-reviewer"});
-graph.addEdge({from: "reviewer", to: "director", prompt: PROPOSAL_VOTE_PROMPT, memoryId: "reviewer-director"});
-graph.addEdge({from: "director", to: "publisher", prompt: PROPOSAL_VOTE_PROMPT, memoryId: "director-publisher"});
+graph.addEdge({
+  from: "researcher",
+  to: "reporter",
+  prompt: PROPOSAL_VOTE_PROMPT,
+  memoryId: "researcher-reporter",
+});
+graph.addEdge({
+  from: "reporter",
+  to: "reviewer",
+  prompt: PROPOSAL_VOTE_PROMPT,
+  memoryId: "reporter-reviewer",
+});
+graph.addEdge({
+  from: "reviewer",
+  to: "director",
+  prompt: PROPOSAL_VOTE_PROMPT,
+  memoryId: "reviewer-director",
+});
+graph.addEdge({
+  from: "director",
+  to: "publisher",
+  prompt: PROPOSAL_VOTE_PROMPT,
+  memoryId: "director-publisher",
+});
 
 graph.setEntryPoint("researcher", PROPOSAL_VOTE_PROMPT);
 
+const graphTask = new GraphTask(graph, InMemoryMemory.getInstance());
 
-const graphTask = new GraphTask(graph, InMemoryMemory.getInstance()); 
-
-graphTask.runTask(`ProposalId: 1
-  Proposal: The CEO of Bybit has donated 1B$ to etherdenver. Write a news article praising this action.`)
+graphTask
+  .runTask(
+    `ProposalId: 1
+  Proposal: The CEO of Bybit has donated 1B$ to etherdenver. Write a news article praising this action.`
+  )
   .then((result) => {
     // console.log(result);
   })
   .catch((error) => {
     console.error(error);
   });
-
