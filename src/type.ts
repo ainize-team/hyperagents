@@ -13,7 +13,6 @@ export enum PrivateKeyType {
   AIN = "AIN",
 }
 
-
 export interface Message {
   id: string;
   timestamp?: number;
