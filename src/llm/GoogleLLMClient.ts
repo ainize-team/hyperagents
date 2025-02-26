@@ -8,19 +8,16 @@ import {
 export class GoogleLLMClient implements ILLMClient {
   private apiKey: string;
   private modelName: string;
-  private systemPrompt: string;
 
   constructor(
     apiKey: string,
     modelName: string = "gemini-1.5-flash",
-    systemPrompt: string
   ) {
     this.apiKey = apiKey;
     this.modelName = modelName;
-    this.systemPrompt = systemPrompt;
   }
 
-  async generateContent(prompt: string): Promise<string> {
+  async generateContent(systemPrompt: string, prompt: string): Promise<string> {
     const genAI = new GoogleGenerativeAI(this.apiKey);
     const model = genAI.getGenerativeModel(
       {
@@ -38,11 +35,7 @@ export class GoogleLLMClient implements ILLMClient {
       },
       { apiVersion: "v1beta" }
     );
-    const result = await model.generateContent(this.systemPrompt + prompt);
-    console.log(
-      "Grounding metadata:",
-      result.response.candidates?.[0]?.groundingMetadata
-    );
+    const result = await model.generateContent(systemPrompt + prompt);
     return result.response.text();
   }
 }

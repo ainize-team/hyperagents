@@ -1,25 +1,19 @@
-// AzureLLMClient.ts
+// OraLLMClient.ts
 import axios from "axios";
 import { ILLMClient } from "./ILLMClient";
 
-export class AzureLLMClient implements ILLMClient {
-  private llmEndpoint: string;
-  private llmApiKey: string;
+export class OraLLMClient implements ILLMClient {
+  private apiKey: string;
   private model: string;
 
-  constructor(
-    llmEndpoint: string,
-    llmApiKey: string,
-    model: string = "gpt-4o-2024-05-13"
-  ) {
-    this.llmEndpoint = llmEndpoint;
-    this.llmApiKey = llmApiKey;
+  constructor(apiKey: string, model: string = "deepseek-ai/DeepSeek-V3") {
+    this.apiKey = apiKey;
     this.model = model;
   }
 
   async generateContent(systemPrompt: string, prompt: string): Promise<string> {
     const response = await axios.post(
-      this.llmEndpoint,
+      "https://api.ora.io/v1/chat/completions",
       {
         model: this.model,
         messages: [
@@ -29,7 +23,8 @@ export class AzureLLMClient implements ILLMClient {
       },
       {
         headers: {
-          "api-key": this.llmApiKey,
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
         },
       }
     );
