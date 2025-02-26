@@ -42,16 +42,17 @@ class GraphTask {
       content: input,
       timestamp: Date.now(),
     });
-    let edge = this.graph.getEntryPoint();
+    let queue = [this.graph.getEntryPoint()];
     while (true) {
-      const agent = this.graph.getNode(edge.to);
-      await agent.run(edge.prompt, edge.memoryId);
-      const edges = this.graph.getEdges(edge.to);
-      if (edges.length == 0) {
+      const edge = queue.shift();
+      if (!edge) {
         const messages = await this.memory.load();
         return messages[messages.length - 1].content;
       }
-      edge = edges[0];
+      const agent = this.graph.getNode(edge.to);
+      await agent.run(edge.prompt, edge.memoryId);
+      const edges = this.graph.getEdges(edge.to);
+      edges.forEach((e) => queue.push(e));
     }
   }
 }
