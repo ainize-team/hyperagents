@@ -42,7 +42,7 @@ class GraphTask {
       content: input,
       timestamp: Date.now(),
     });
-    let queue = [this.graph.getEntryPoint()];
+    let queue = this.graph.getEntryPoint();
     while (true) {
       const edge = queue.shift();
       if (!edge) {

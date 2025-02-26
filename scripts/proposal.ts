@@ -32,8 +32,7 @@ const researcher = Agent.fromConfigFile("researcher.json", {
 });
 
 const reviewer = Agent.fromConfigFile("reviewer.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
+  llmApiKey: process.env.ORA_API_KEY!,
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.REVIEWER_ETH_PRIVATE_KEY!],
   ]),
@@ -71,32 +70,12 @@ graph.addAgentNode({ agent: reviewer, nodeId: "reviewer" });
 graph.addAgentNode({ agent: director, nodeId: "director" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher" });
 
-graph.addEdge({
-  from: "researcher",
-  to: "reporter",
-  prompt: PROPOSAL_VOTE_PROMPT,
-  memoryId: "researcher-reporter",
-});
-graph.addEdge({
-  from: "reporter",
-  to: "reviewer",
-  prompt: PROPOSAL_VOTE_PROMPT,
-  memoryId: "reporter-reviewer",
-});
-graph.addEdge({
-  from: "reviewer",
-  to: "director",
-  prompt: PROPOSAL_VOTE_PROMPT,
-  memoryId: "reviewer-director",
-});
-graph.addEdge({
-  from: "director",
-  to: "publisher",
-  prompt: PROPOSAL_VOTE_PROMPT,
-  memoryId: "director-publisher",
-});
-
 graph.setEntryPoint("researcher", PROPOSAL_VOTE_PROMPT);
+graph.setEntryPoint("publisher", PROPOSAL_VOTE_PROMPT);
+graph.setEntryPoint("director", PROPOSAL_VOTE_PROMPT);
+graph.setEntryPoint("reviewer", PROPOSAL_VOTE_PROMPT);
+graph.setEntryPoint("reporter", PROPOSAL_VOTE_PROMPT);
+
 
 const graphTask = new GraphTask(graph, InMemoryMemory.getInstance());
 
