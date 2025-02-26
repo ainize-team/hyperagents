@@ -25,6 +25,7 @@
   "homepage": "https://github.com/ainize-team/hyperagents#readme",
   "description": "",
   "dependencies": {
+    "@ainblockchain/ain-js": "^1.13.3",
     "@azure/identity": "^4.7.0",
     "@google/generative-ai": "^0.22.0",
     "@types/node": "^22.13.5",
