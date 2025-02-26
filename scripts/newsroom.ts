@@ -12,7 +12,7 @@ const researcher = Agent.fromConfigFile("researcher.json", {
   llmApiKey: process.env.GOOGLE_API_KEY!,
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.RESEARCHER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.AIN, process.env.RESEARCHER_AIN_PRIVATE_KEY!]
+    [PrivateKeyType.AIN, process.env.RESEARCHER_AIN_PRIVATE_KEY!],
   ]),
 });
 
@@ -143,7 +143,7 @@ Do not use bullet points.
 graph.addEdge({
   from: "director-1",
   to: "publisher-1",
-  prompt: `Convert the article to HTML format.
+  prompt: `Convert the article to HTML format. No verbose text. You ONLY output HTML with out code block.
   
 <Final Article>
 ^FINAL_ARTICLE^
