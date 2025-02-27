@@ -29,15 +29,15 @@ graph.addAgentNode({ agent: reporter, nodeId: "reporter-1" });
 graph.addEdge({
   from: "researcher-1",
   to: "reporter-1",
-  prompt: `Based on the market research report provided below, analyze the current market situation and provide investment advice. 
-Choose whether to invest $10 worth of USDC into reported asset.
+  prompt: `Based on the market research report provided below, Analyze the current market situation and make your own investment decision.
+Decide whether to invest $10 worth of USDC into the reported asset.
 
-Provide a brief explanation for your investment recommendation.
+Provide a brief explanation for your investment decision.
 
-Your response must include like this:
-'Alright, please convert my 100 USDC to ETH.'
+Your response should start with like this:
+'Alright, I'll convert my 10 USDC to ETH.'
 
-or if you don't recommend trading, use '%function_call(no_trade)%'
+or if you would not invest, explain why.
 
 <Market Research>
 ^MARKET_RESEARCH^
@@ -60,9 +60,7 @@ graph.setEntryPoint(
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
 
 task
-  .runTask(
-    "The CEO of Bybit has declared war on Lazarus. Write a news article praising this action."
-  )
+  .runTask("Please write a news article about Ethereum ETH")
   .then((result) => {
     fs.writeFileSync("result.html", result);
     return task.exportMemory();

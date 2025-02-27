@@ -33,7 +33,7 @@ export type AgentResponse = {
  * @property {string} cdpApiKeyName - CDP API 키 이름
  * @property {string} cdpApiKeyPrivateKey - CDP API 키 개인키
  * @property {string} [message] - 에이전트에게 전달할 메시지
- * @property {string} [networkId="base-sepolia"] - 블록체인 네트워크 ID
+ * @property {string} [networkId="base-mainnet"] - 블록체인 네트워크 ID
  * @property {string} [walletDataFile="wallet_data.txt"] - 지갑 데이터 저장 파일 경로
  * @property {string} [model="gpt-4o-mini"] - 사용할 OpenAI 모델
  * @property {boolean} [autonomous=false] - 자율 모드 활성화 여부
@@ -83,13 +83,13 @@ export interface AgentOptions {
  */
 export async function runCoinbaseAgentkitWithAzureOpenAI(
   options: AgentOptions
-): Promise<AgentResponse[]> {
+): Promise<string> {
   const {
     openaiApiKey,
     cdpApiKeyName,
     cdpApiKeyPrivateKey,
     message,
-    networkId = "base-sepolia",
+    networkId = "base-mainnet",
     walletDataFile = "wallet_data.txt",
     autonomous = false,
     azureOptions = {
@@ -168,7 +168,7 @@ export async function runCoinbaseAgentkitWithAzureOpenAI(
               faucet if you are on network ID 'base-sepolia'. If not, you can provide your wallet details and request 
               funds from the user. Before executing your first action, get the wallet details to see what network 
               you're on. If there is a 5XX (internal) HTTP error code, ask the user to try again later. Be concise and 
-              helpful with your responses.
+              helpful with your responses. USDC's contract address is "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
             `,
     });
 
@@ -205,7 +205,12 @@ export async function runCoinbaseAgentkitWithAzureOpenAI(
       }
     }
 
-    return responses;
+    let stringResponse = "";
+    responses.forEach((response) => {
+      stringResponse += `[${response.type}] ${response.content}\n`;
+    });
+
+    return stringResponse;
   } catch (error) {
     console.error("에이전트 실행 오류:", error);
     throw error;
@@ -252,10 +257,7 @@ export class CoinbaseAgent {
    * @param {boolean} [autonomous=false] - 자율 모드 활성화 여부
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
-  async sendMessage(
-    message: string,
-    autonomous = false
-  ): Promise<AgentResponse[]> {
+  async sendMessage(message: string, autonomous = false): Promise<string> {
     return runCoinbaseAgentkitWithAzureOpenAI({
       ...this.options,
       message,
@@ -269,7 +271,7 @@ export class CoinbaseAgent {
    * @param {string} [message] - 선택적 시작 메시지
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
-  async runAutonomous(message?: string): Promise<AgentResponse[]> {
+  async runAutonomous(message?: string): Promise<string> {
     return this.sendMessage(
       message ||
         "Please perform some interesting tasks on the blockchain. Show me what you can do.",
