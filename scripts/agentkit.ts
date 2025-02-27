@@ -8,8 +8,8 @@ async function main() {
     openaiApiKey: process.env.OPENAI_API_KEY || "",
     cdpApiKeyName: process.env.CDP_API_KEY_NAME || "",
     cdpApiKeyPrivateKey: process.env.CDP_API_KEY_PRIVATE_KEY || "",
-    message:
-      "transfer 0.0001 ETH to 0x493460bcac0b546dfbac830d7628164ad82d654d",
+    networkId: "base-mainnet",
+    message: "Check the balance of every asset in the wallet",
   });
 
   // 결과 출력

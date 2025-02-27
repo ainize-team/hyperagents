@@ -29,14 +29,20 @@ graph.addAgentNode({ agent: reporter, nodeId: "reporter-1" });
 graph.addEdge({
   from: "researcher-1",
   to: "reporter-1",
-  prompt: `Give reporter a news article guide in a casual, informal tone, as if speaking to a junior colleague. Keep it short, like giving quick feedback to a subordinate.
-Use this tone as a reference: Researcher, I checked out your research—good work! + Reporter's guide
-The article guide should be a single paragraph, written in a natural, conversational style without bullet points. Focus on explaining the key issue (what happened) and the future outlook (how this issue might impact things going forward).
+  prompt: `Based on the market research report provided below, analyze the current market situation and provide investment advice. 
+Choose whether to invest $10 worth of USDC into reported asset.
+
+Provide a brief explanation for your investment recommendation.
+
+Your response must include like this:
+'Alright, please convert my 100 USDC to ETH.'
+
+or if you don't recommend trading, use '%function_call(no_trade)%'
 
 <Market Research>
 ^MARKET_RESEARCH^
 `,
-  memoryId: "ARTICLE_GUIDE",
+  memoryId: "TRADE",
 });
 
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)

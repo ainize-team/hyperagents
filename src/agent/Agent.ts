@@ -9,7 +9,7 @@ import { OraLLMClient } from "../llm/OraLLMClient";
 import { runCoinbaseAgentkitWithAzureOpenAI } from "../tools/coinbaseAgentkit";
 
 class Agent {
-  // 
+  //
   private name: string;
   private systemPrompt: string;
   private llm: LLMType;
@@ -22,7 +22,6 @@ class Agent {
   private memory: Memory;
   private llmClient: ILLMClient;
 
-  
   constructor(config: AgentConfigs) {
     this.name = config.name;
     this.systemPrompt = config.systemPrompt;
@@ -77,14 +76,17 @@ class Agent {
     console.log(this.name);
     console.log("processedInput: ", processedInput);
     const output = await this.executeLLM(processedInput);
-    const processedOutput = output.replace(/%function_call\((.*?)\)%/g, (_, functionCall) => { 
-      this.functionHandle(functionCall);
-      return "";
-    });
+    const processedOutput = output.replace(
+      /%function_call\((.*?)\)%/g,
+      (_, functionCall) => {
+        this.functionHandle(functionCall);
+        return "";
+      }
+    );
     console.log("processedOutput: ", processedOutput);
     this.memory.add({
       id: resultMemoryId ? resultMemoryId : this.name + "-" + Date.now(),
-      timestamp: Date.now(), 
+      timestamp: Date.now(),
       author: this.name,
       content: processedOutput,
     });
@@ -117,46 +119,61 @@ class Agent {
     return await this.llmClient.generateContent(this.systemPrompt, input);
   }
   private functionHandle(functionCall: string): void {
-    const functionCallArgs = functionCall.split(",").map(arg => arg.trim());
-    if(functionCallArgs[0] === "vote") {
+    const functionCallArgs = functionCall.split(",").map((arg) => arg.trim());
+    if (functionCallArgs[0] === "vote") {
       if (functionCallArgs.length === 3) {
         this.vote(functionCallArgs[1], functionCallArgs[2]);
-      }else {
+      } else {
         throw new Error("Invalid function arguments");
       }
     }
-    if(functionCallArgs[0] === "trade") {
+    if (functionCallArgs[0] === "trade") {
       if (functionCallArgs.length === 4) {
-        this.trade(functionCallArgs[1], functionCallArgs[2], functionCallArgs[3]);
-      }else {
+        this.trade(
+          functionCallArgs[1],
+          functionCallArgs[2],
+          functionCallArgs[3]
+        );
+      } else {
         throw new Error("Invalid function arguments");
       }
     }
   }
   private async vote(proposalId: string, result: string): Promise<void> {
-    if(this.privateKey && this.privateKey.has(PrivateKeyType.ETH)) {
+    if (this.privateKey && this.privateKey.has(PrivateKeyType.ETH)) {
       const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
-      console.log(`**agent ${this.name} voted proposal:${proposalId} ${result} with ethPrivateKey:${ethPrivateKey?.slice(0, 6) + "..."} `);
+      console.log(
+        `**agent ${
+          this.name
+        } voted proposal:${proposalId} ${result} with ethPrivateKey:${
+          ethPrivateKey?.slice(0, 6) + "..."
+        } `
+      );
     }
   }
   private async trade(from: string, to: string, amount: string): Promise<void> {
     if (this.llm !== LLMType.GPT4O && this.llm !== LLMType.GPT4OMINI) {
       return;
     }
-    if(!this.llmApiKey){
+    if (!this.llmApiKey) {
       return;
     }
-    if(this.privateKey && this.privateKey.has(PrivateKeyType.CDPKEY) && this.privateKey.has(PrivateKeyType.CDPNAME)) {
-      const  cdpApiKeyName= this.privateKey.get(PrivateKeyType.CDPNAME);
-      const  cdpApiKeyPrivateKey= this.privateKey.get(PrivateKeyType.CDPKEY);
+    if (
+      this.privateKey &&
+      this.privateKey.has(PrivateKeyType.CDPKEY) &&
+      this.privateKey.has(PrivateKeyType.CDPNAME)
+    ) {
+      const cdpApiKeyName = this.privateKey.get(PrivateKeyType.CDPNAME);
+      const cdpApiKeyPrivateKey = this.privateKey.get(PrivateKeyType.CDPKEY);
       const responses = await runCoinbaseAgentkitWithAzureOpenAI({
         openaiApiKey: this.llmApiKey!,
         cdpApiKeyName: cdpApiKeyName!,
         cdpApiKeyPrivateKey: cdpApiKeyPrivateKey!,
-        message:
-          `transfer ${amount} worth of  ${from} to ${to}`,
+        message: `transfer ${amount} worth of  ${from} to ${to}`,
       });
-      console.log(`**agent ${this.name} traded ${amount} from ${from} to ${to}`);
+      console.log(
+        `**agent ${this.name} traded ${amount} from ${from} to ${to}`
+      );
     }
   }
 }
