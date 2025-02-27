@@ -30,12 +30,12 @@ graph.addEdge({
   from: "researcher-1",
   to: "reporter-1",
   prompt: `Based on the market research report provided below, Analyze the current market situation and make your own investment decision.
-Decide whether to invest $10 worth of USDC into the reported asset.
+Decide whether to invest $1 worth of USDC into the reported asset.
 
 Provide a brief explanation for your investment decision.
 
 Your response should start with like this:
-'Alright, I'll convert my 10 USDC to ETH.'
+'Alright, I'll convert my 1 USDC to ETH.'
 
 or if you would not invest, explain why.
 

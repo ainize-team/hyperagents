@@ -6,19 +6,19 @@ dotenv.config();
 async function main() {
   const responses = await runCoinbaseAgentkitWithAzureOpenAI({
     openaiApiKey: process.env.OPENAI_API_KEY || "",
-    cdpApiKeyName: process.env.CDP_API_KEY_NAME || "",
-    cdpApiKeyPrivateKey: process.env.CDP_API_KEY_PRIVATE_KEY || "",
+    cdpApiKeyName: process.env.RESEARCHER_CDPNAME || "",
+    cdpApiKeyPrivateKey: process.env.RESEARCHER_CDPKEY || "",
     networkId: "base-mainnet",
-    message: "Check the balance of every asset in the wallet",
+    message: "Convert 0.006 ETH to USDC",
   });
 
-  // 결과 출력
-  responses.forEach((response) => {
-    console.log(`[${response.type}] ${response.content}`);
-  });
+  console.log(responses);
 }
 
 main().catch((error) => {
   console.error("실행 중 오류 발생:", error);
   process.exit(1);
 });
+
+// "Check the balance of every asset in the wallet"
+//
