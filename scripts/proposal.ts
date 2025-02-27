@@ -8,6 +8,7 @@ import { PrivateKeyType } from "../src/type";
 dotenv.config();
 
 const PROPOSAL_VOTE_PROMPT = `
+starts your response with 'ProposalId:proposalId' and replace proposalId with the actual proposal ID.
 Read the proposal carefully.
 You should choose one of the following options:
 1. Agree
@@ -15,10 +16,8 @@ You should choose one of the following options:
 3. Abstain
 Provide your short reason on whether you agree or disagree.
 Your response must include either texts:
-'%function_call(vote, proposalId, true)%' if you agree.
-'%function_call(vote, proposalId, false)%' if you disagree or abstain.
-There is no giveup.
-Replace proposalId with the actual proposal ID.
+end response with 'I Agree.' if you agree.
+There is no giveup
 
 Proposal
 ^USER_INPUT^
@@ -64,17 +63,17 @@ const publisher = Agent.fromConfigFile("publisher.json", {
 });
 
 const graph = new Graph();
-graph.addAgentNode({ agent: researcher, nodeId: "researcher" });
+graph.addAgentNode({ agent: researcher, nodeId: "researcher"});
 graph.addAgentNode({ agent: reporter, nodeId: "reporter" });
 graph.addAgentNode({ agent: reviewer, nodeId: "reviewer" });
 graph.addAgentNode({ agent: director, nodeId: "director" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher" });
 
-graph.setEntryPoint("researcher", PROPOSAL_VOTE_PROMPT);
-graph.setEntryPoint("publisher", PROPOSAL_VOTE_PROMPT);
-graph.setEntryPoint("director", PROPOSAL_VOTE_PROMPT);
-graph.setEntryPoint("reviewer", PROPOSAL_VOTE_PROMPT);
-graph.setEntryPoint("reporter", PROPOSAL_VOTE_PROMPT);
+graph.setEntryPoint("researcher", PROPOSAL_VOTE_PROMPT, "researcher-vote", ["vote"]);
+graph.setEntryPoint("publisher", PROPOSAL_VOTE_PROMPT, "publisher-vote", ["vote"]);
+graph.setEntryPoint("director", PROPOSAL_VOTE_PROMPT, "director-vote", ["vote"]);
+graph.setEntryPoint("reviewer", PROPOSAL_VOTE_PROMPT, "reviewer-vote", ["vote"]);
+graph.setEntryPoint("reporter", PROPOSAL_VOTE_PROMPT, "reporter-vote", ["vote"]);
 
 
 const graphTask = new GraphTask(graph, InMemoryMemory.getInstance());

@@ -43,6 +43,7 @@ or if you don't recommend trading, use '%function_call(no_trade)%'
 ^MARKET_RESEARCH^
 `,
   memoryId: "TRADE",
+  functions: ["trade"],
 });
 
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
