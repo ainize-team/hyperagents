@@ -6,6 +6,7 @@ import { AzureLLMClient } from "../llm/AzureLLMClient";
 import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
 import { Memory } from "../memory";
 import { OraLLMClient } from "../llm/OraLLMClient";
+import { runCoinbaseAgentkitWithAzureOpenAI } from "../tools/coinbaseAgentkit";
 
 class Agent {
   // 
@@ -120,7 +121,14 @@ class Agent {
     if(functionCallArgs[0] === "vote") {
       if (functionCallArgs.length === 3) {
         this.vote(functionCallArgs[1], functionCallArgs[2]);
-      } else {
+      }else {
+        throw new Error("Invalid function arguments");
+      }
+    }
+    if(functionCallArgs[0] === "trade") {
+      if (functionCallArgs.length === 4) {
+        this.trade(functionCallArgs[1], functionCallArgs[2], functionCallArgs[3]);
+      }else {
         throw new Error("Invalid function arguments");
       }
     }
@@ -129,6 +137,26 @@ class Agent {
     if(this.privateKey && this.privateKey.has(PrivateKeyType.ETH)) {
       const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
       console.log(`**agent ${this.name} voted proposal:${proposalId} ${result} with ethPrivateKey:${ethPrivateKey?.slice(0, 6) + "..."} `);
+    }
+  }
+  private async trade(from: string, to: string, amount: string): Promise<void> {
+    if (this.llm !== LLMType.GPT4O && this.llm !== LLMType.GPT4OMINI) {
+      return;
+    }
+    if(!this.llmApiKey){
+      return;
+    }
+    if(this.privateKey && this.privateKey.has(PrivateKeyType.CDPKEY) && this.privateKey.has(PrivateKeyType.CDPNAME)) {
+      const  cdpApiKeyName= this.privateKey.get(PrivateKeyType.CDPNAME);
+      const  cdpApiKeyPrivateKey= this.privateKey.get(PrivateKeyType.CDPKEY);
+      const responses = await runCoinbaseAgentkitWithAzureOpenAI({
+        openaiApiKey: this.llmApiKey!,
+        cdpApiKeyName: cdpApiKeyName!,
+        cdpApiKeyPrivateKey: cdpApiKeyPrivateKey!,
+        message:
+          `transfer ${amount} worth of  ${from} to ${to}`,
+      });
+      console.log(`**agent ${this.name} traded ${amount} from ${from} to ${to}`);
     }
   }
 }
