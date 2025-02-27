@@ -63,6 +63,7 @@ const publisher = Agent.fromConfigFile("publisher.json", {
 });
 
 const graph = new Graph();
+
 graph.addAgentNode({ agent: researcher, nodeId: "researcher"});
 graph.addAgentNode({ agent: reporter, nodeId: "reporter" });
 graph.addAgentNode({ agent: reviewer, nodeId: "reviewer" });

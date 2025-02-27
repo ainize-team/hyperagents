@@ -257,6 +257,7 @@ export class CoinbaseAgent {
    * @param {boolean} [autonomous=false] - 자율 모드 활성화 여부
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
+  
   async sendMessage(message: string, autonomous = false): Promise<string> {
     return runCoinbaseAgentkitWithAzureOpenAI({
       ...this.options,
@@ -271,6 +272,7 @@ export class CoinbaseAgent {
    * @param {string} [message] - 선택적 시작 메시지
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
+  
   async runAutonomous(message?: string): Promise<string> {
     return this.sendMessage(
       message ||

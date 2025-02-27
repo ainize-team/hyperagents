@@ -21,4 +21,3 @@ main().catch((error) => {
 });
 
 // "Check the balance of every asset in the wallet"
-//

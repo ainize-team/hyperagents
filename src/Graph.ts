@@ -26,6 +26,7 @@ class Graph {
   }
 
   setEntryPoint(name: string, prompt: string, memoryId?: string, functions?: string[]) {
+
     this.edge.get(this.ENTRY_POINT_KEY)?.set(name, {
       to: name,
       from: this.ENTRY_POINT_KEY,
