@@ -37,6 +37,7 @@ The article guide should be a single paragraph, written in a natural, conversati
 ^MARKET_RESEARCH^
 `,
   memoryId: "ARTICLE_GUIDE",
+  functions: ["trade"],
 });
 
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
