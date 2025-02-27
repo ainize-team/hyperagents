@@ -11,6 +11,8 @@ export enum MemoryType {
 export enum PrivateKeyType {
   ETH = "ETH",
   AIN = "AIN",
+  CDPNAME = "CDPNAME",
+  CDPKEY = "CDPKEY",
 }
 
 export interface Message {

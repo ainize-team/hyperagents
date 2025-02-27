@@ -50,7 +50,8 @@ class GraphTask {
         return messages[messages.length - 1].content;
       }
       const agent = this.graph.getNode(edge.to);
-      await agent.run(edge.prompt, edge.memoryId);
+      await agent.run(edge.prompt, edge.memoryId, edge.functions);
+
       const edges = this.graph.getEdges(edge.to);
       edges.forEach((e) => queue.push(e));
     }
