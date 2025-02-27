@@ -13,7 +13,7 @@ class Graph {
   private edge: Map<string, Map<string, EdgeData>>;
   constructor() {
     this.node = new Map();
-    this.edge = new Map();
+    this.edge = new Map([[this.ENTRY_POINT_KEY, new Map()]]);
   }
 
   getEntryPoint() {
@@ -21,16 +21,16 @@ class Graph {
     if (!entryPoint || entryPoint.length == 0) {
       throw new Error("Entry point not set");
     }
-    return entryPoint[0];
+    return entryPoint;
   }
 
   setEntryPoint(name: string, prompt: string, memoryId?: string) {
-    this.edge.set(
-      this.ENTRY_POINT_KEY,
-      new Map([
-        [name, { to: name, from: this.ENTRY_POINT_KEY, prompt: prompt, memoryId: memoryId? memoryId : undefined}],
-      ])
-    );
+    this.edge.get(this.ENTRY_POINT_KEY)?.set(name, {
+      to: name,
+      from: this.ENTRY_POINT_KEY,
+      prompt,
+      memoryId: memoryId || undefined,
+    });
   }
 
   addAgentNode(nodeconfig: { agent: Agent; nodeId: string }) {
