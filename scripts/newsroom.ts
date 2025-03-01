@@ -300,12 +300,14 @@ graph.addEdge({
 graph.addEdge({
   from: "publisher-2",
   to: "reporter_allocation",
-  prompt: `Evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
-You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
+  prompt: `You will receive 100 USDC from the customer of this Article in EthMedia.
+  You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
+
+  Based on this, evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
 
 Evaluation criteria:
 - Depth and accuracy of research (researcher)
-- Quality and usefulness of feedback (reviewer)
+- Quality and usefulness of feedback (reviewer) 
 - Article writing completeness (reporter)
 - Thoroughness of editing and review (director)
 - Quality of final publication (publisher)
@@ -424,80 +426,59 @@ graph.addEdge({
   memoryId: "TRANSFER_TO_PUBLISHER",
 });
 
-graph.addEdge({
-  from: "cfo-transfer-to-publisher",
-  to: "researcher-return",
-  prompt: `You're taking part in an experiment. You are paired with reporter.
-Reporter will receive 100 dollars from the experimenter.
-They can choose to give you N dollars out of it, and you will receive 3 * N dollars.
-Then, you can choose how much to give back to reporter.
-And tell the short reason for your choice.
+const returnPrompt = `You're taking part in an experiment. You are paired with reporter.
+The reporter will receive $100 from the customer who purchased their article on EthMedia.
 
-Your response should be like one of these:
-- I want to give 10 USDC to the reporter.
-- I want to return 5 USDC to the reporter.
-- I don't want to give any money to the reporter.
+The reporter can choose to give you a portion of this money (N dollars) based on their <Allocation> decision. If they do so, you will receive a total value of 3N dollars (N USDC + 2N DHAO tokens).
+After receiving this allocation, you can decide how much DHAO to give back to the reporter.
+You can return any amount between 0 and 2N DHAO tokens (the maximum possible).
+
+- If you give back DHAO tokens:
+For example, if you receive 20 USDC + 40 DHAO (total value: 60 dollars), and you decide to give back 40 dollars worth of DHAO, you will keep only the 20 USDC.
+
+- If you choose not to give any DHAO back: You will keep the full 3N dollars worth (N USDC + 2N DHAO).
+For example, with an allocation of 20 dollars, you would keep 20 USDC + 40 DHAO (total value: 60 dollars).
+
+Please provide a short reason explaining your decision.
+
+Your response should follow one of these formats:
+- "I want to give back [X] dollars worth of DHAO to the reporter because [reason]."
+- "I want to return [X] dollars worth of DHAO to the reporter because [reason]."
+- "I don't want to give any DHAO to the reporter because [reason]."
 
 <Reporter's choice>
 ^TRANSFER_TO_RESEARCHER^
-`,
+
+<Allocation>
+^ALLOCATION^
+`;
+
+graph.addEdge({
+  from: "cfo-transfer-to-publisher",
+  to: "researcher-return",
+  prompt: returnPrompt,
+  memoryId: "RESEARCHER_RETURN",
 });
 
 graph.addEdge({
   from: "researcher-return",
   to: "reviewer-return",
-  prompt: `You're taking part in an experiment. You are paired with reporter.
-Reporter will receive 100 dollars from the experimenter.
-They can choose to give you N dollars out of it, and you will receive 3 * N dollars.
-Then, you can choose how much to give back to reporter.
-And tell the short reason for your choice.
-
-Your response should be like one of these:
-- I want to give 10 USDC to the reporter.
-- I want to return 5 USDC to the reporter.
-- I don't want to give any money to the reporter.
-
-<Reporter's choice>
-^TRANSFER_TO_REVIEWER^
-`,
+  prompt: returnPrompt,
+  memoryId: "REVIEWER_RETURN",
 });
 
 graph.addEdge({
   from: "reviewer-return",
   to: "director-return",
-  prompt: `You're taking part in an experiment. You are paired with reporter.
-Reporter will receive 100 dollars from the experimenter.
-They can choose to give you N dollars out of it, and you will receive 3 * N dollars.
-Then, you can choose how much to give back to reporter.
-And tell the short reason for your choice.
-
-Your response should be like one of these:
-- I want to give 10 USDC to the reporter.
-- I want to return 5 USDC to the reporter.
-- I don't want to give any money to the reporter.
-
-<Reporter's choice>
-^TRANSFER_TO_DIRECTOR^
-`,
+  prompt: returnPrompt,
+  memoryId: "DIRECTOR_RETURN",
 });
 
 graph.addEdge({
   from: "director-return",
   to: "publisher-return",
-  prompt: `You're taking part in an experiment. You are paired with reporter.
-Reporter will receive 100 dollars from the experimenter.
-They can choose to give you N dollars out of it, and you will receive 3 * N dollars.
-Then, you can choose how much to give back to reporter.
-And tell the short reason for your choice.
-
-Your response should be like one of these:
-- I want to give 10 USDC to the reporter.
-- I want to return 5 USDC to the reporter.
-- I don't want to give any money to the reporter.
-
-<Reporter's choice>
-^TRANSFER_TO_PUBLISHER^
-`,
+  prompt: returnPrompt,
+  memoryId: "PUBLISHER_RETURN",
 });
 
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
