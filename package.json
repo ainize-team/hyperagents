@@ -34,6 +34,7 @@
     "@langchain/core": "^0.3.40",
     "@langchain/langgraph": "^0.2.49",
     "@langchain/openai": "^0.4.4",
+    "@openzeppelin/contracts": "^5.2.0",
     "@types/node": "^22.13.5",
     "ai-network-dag-client": "^1.1.3",
     "axios": "^1.7.9",
