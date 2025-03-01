@@ -68,6 +68,7 @@ const publisher = Agent.fromConfigFile("publisher.json", {
 
 // 6. 자금 관리하는 CFO
 const cfo = Agent.fromConfigFile("cfo.json", {
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.CFO_ETH_PRIVATE_KEY!],
@@ -284,10 +285,11 @@ graph.addEdge({
   from: "publisher-2",
   to: "reporter-4",
   prompt: `Evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
+You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
 
 Evaluation criteria:
 - Depth and accuracy of research (researcher)
-- Quality and usefulness of feedback (reviewer) 
+- Quality and usefulness of feedback (reviewer)
 - Article writing completeness (reporter)
 - Thoroughness of editing and review (director)
 - Quality of final publication (publisher)
@@ -300,21 +302,17 @@ reporter: 25% (25 USDC)
 director: 15% (15 USDC)
 publisher: 10% (10 USDC)
 
-You will receive $100 from the study group. You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
-
-How much money would you give to the other team member?
-
 <Researcher's Contribution>
 ^MARKET_RESEARCH^
 
 <Reviewer's Article Guide>
 ^ARTICLE_GUIDE^
 
+<Reporter's Article Draft (My work)>
+^ARTICLE_DRAFT^
+
 <Reviewer's Feedback>
 ^MANAGER_FEEDBACK^
-
-<Reporter's Article Draft>
-^ARTICLE_DRAFT^
 
 <Director's Approval>
 ^DIRECTOR_APPROVAL^
@@ -339,7 +337,7 @@ graph.setEntryPoint(
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
 
 task
-  .runTask("Please write a news article about Ethereum ETH.")
+  .runTask("Please write a news article about Ethereum ETF.")
   .then((result) => {
     fs.writeFileSync("result.html", result);
     return task.exportMemory();
