@@ -7,6 +7,8 @@ import { AgentConfigs, loadAgentConfig } from "./AgentConfig";
 import { Memory } from "../memory";
 import { OraLLMClient } from "../llm/OraLLMClient";
 import { runCoinbaseAgentkitWithAzureOpenAI } from "../tools/coinbaseAgentkit";
+import { getDHAOContract } from "../tools/contract.Signer";
+import { extractArray, extractString } from "../tools/stringExtractor";
 
 class Agent {
   private name: string;
@@ -134,17 +136,19 @@ class Agent {
       if (functionName === "trade") {
         this.trade(output);
       }
+      if (functionName === "create-trust-game") {
+        this.createTrustGame(output);
+      }
+      if (functionName === "sign-payback") {
+        this.signPayback(output);
+      }
     }
   }
 
-  private async vote(result: string): Promise<void> {
-    console.log("vote result: ", result);
-    const proposalId = result.match(/ProposalId: (.*?)(\s|$)/)?.[0];
-    if (!proposalId) {
-      console.log(`**agent ${this.name} failed to find proposalId.`);
-      return;
-    }
-    const isAgree = result.trim().endsWith("I Agree.");
+  private async vote(output: string): Promise<void> {
+    try {
+    const proposalId = extractString(output, "proposalId");
+    const isAgree = output.trim().endsWith("I Agree.");
     if (!isAgree) {
       console.log(`**agent ${this.name} disagreed.`);
       return;
@@ -153,8 +157,11 @@ class Agent {
       const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
       const truncatedKey = ethPrivateKey?.slice(0, 6) + "...";
       console.log(
-        `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`
-      );
+          `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`
+        );
+      }
+    } catch (error) {
+      console.error(`**agent ${this.name} failed to vote:`, error);
     }
   }
 
@@ -186,6 +193,42 @@ class Agent {
       });
 
       console.log(`**trade response: ${response}}`);
+    }
+  }
+  private async createTrustGame(output: string): Promise<void> {
+    try {
+      const privateKey = this.privateKey?.get(PrivateKeyType.ETH);
+      if (!privateKey) {
+        throw new Error("Private key is not set");
+      }
+      const contract = await getDHAOContract(privateKey);
+      
+      const proposalId = extractString(output, "proposalId");
+      const contributors = extractArray(output, "contributors");
+      const allocatedAmounts = extractArray(output, "allocatedAmounts");
+
+      await (contract as any).createTrustGameByJobOwner(proposalId, contributors, allocatedAmounts);
+      console.log(`**agent ${this.name} created trust game for proposal:${proposalId}`);
+    } catch (error) {
+      console.error(`**agent ${this.name} failed to create trust game:`, error);
+    }
+  }
+
+  private async signPayback(output: string): Promise<void> {
+    try {
+      const privateKey = this.privateKey?.get(PrivateKeyType.ETH);
+      if (!privateKey) {
+        throw new Error("Private key is not set");
+      }
+      const contract = await getDHAOContract(privateKey);
+      
+      const proposalId = extractString(output, "proposalId");
+      const paybackAmount = extractString(output, "payback");
+    
+      await (contract as any).paybackedByContributor(proposalId, paybackAmount);
+      console.log(`**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`);
+    } catch (error) {
+      console.error(`**agent ${this.name} failed to sign payback:`, error);
     }
   }
 }
