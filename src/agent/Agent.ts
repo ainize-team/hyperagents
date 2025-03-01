@@ -80,11 +80,14 @@ class Agent {
       return memoryData?.content || memoryId;
     });
 
+    // Simple separator for better readability
+    console.log("\n--------- AGENT INFO ---------");
     console.log("### Agent: ", this.name);
     // console.log("processedInput: ", processedInput);
 
     const output = await this.executeLLM(processedInput);
-    console.log("### Agent output: ", output);
+    console.log("\n--------- AGENT OUTPUT ---------");
+    console.log(output);
     if (functions) {
       this.functionHandle(functions, output);
     }
