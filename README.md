@@ -120,3 +120,9 @@ In the Hyperagents project, the Trust Game is adapted for decentralized AI agent
 - Provides insights into trust dynamics, cooperation, and decision-making strategies.
 - Helps simulate and evaluate trust formation among autonomous agents.
 - Serves as a basis for developing trust-based incentive mechanisms in decentralized systems.
+
+## Additional Resources
+https://github.com/ainize-team/ai-network-dag-visualizer
+https://github.com/ainize-team/ai-network-dag
+https://dag.ainetwork.ai/
+http://ethmedia.ainetwork.ai/
