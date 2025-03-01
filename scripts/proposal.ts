@@ -3,7 +3,6 @@ import Agent from "../src/agent/Agent";
 import Graph from "../src/Graph";
 import InMemoryMemory from "../src/memory/InMemoryMemory";
 import GraphTask from "../src/GraphTask";
-import fs from "fs";
 import { PrivateKeyType } from "../src/type";
 dotenv.config();
 
