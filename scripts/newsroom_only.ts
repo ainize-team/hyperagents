@@ -13,69 +13,30 @@ const researcher = Agent.fromConfigFile("researcher.json", {
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.RESEARCHER_ETH_PRIVATE_KEY!],
     [PrivateKeyType.AIN, process.env.RESEARCHER_AIN_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
   ]),
-  walletDataStr: process.env.RESEARCHER_WALLET_DATA_STR!,
 });
 
-// 2. 뉴스 기사 검토자
 const reviewer = Agent.fromConfigFile("reviewer.json", {
   llmApiKey: process.env.ORA_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REVIEWER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.REVIEWER_WALLET_DATA_STR!,
 });
 
-// 3. 뉴스 기사 작성자
 const reporter = Agent.fromConfigFile("reporter.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REPORTER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
+    [PrivateKeyType.CDPNAME, process.env.REPORTER_CDPNAME!],
+    [PrivateKeyType.CDPKEY, process.env.REPORTER_CDPKEY!],
   ]),
-  walletDataStr: process.env.REPORTER_WALLET_DATA_STR!,
 });
 
-// 4. 뉴스 기사 최종 검토자
 const director = Agent.fromConfigFile("director.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.DIRECTOR_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.DIRECTOR_WALLET_DATA_STR!,
 });
 
-// 5. 뉴스 기사 게시자
 const publisher = Agent.fromConfigFile("publisher.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.PUBLISHER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.PUBLISHER_WALLET_DATA_STR!,
-});
-
-// 6. 자금 관리하는 CFO
-const cfo = Agent.fromConfigFile("cfo.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.CFO_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.CFO_WALLET_DATA_STR!,
 });
 
 const graph = new Graph();
@@ -89,11 +50,6 @@ graph.addAgentNode({ agent: director, nodeId: "director-1" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher-1" });
 graph.addAgentNode({ agent: reporter, nodeId: "reporter-3" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher-2" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-1" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-2" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-3" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-4" });
 
 graph.addEdge({
   from: "researcher-1",
@@ -188,7 +144,6 @@ Do not use bullet points.
 <Final Article>
 ^FINAL_ARTICLE^
 `,
-  memoryId: "DIRECTOR_APPROVAL",
 });
 
 graph.addEdge({
@@ -279,50 +234,6 @@ graph.addEdge({
   memoryId: "FINAL_PUBLISHED_ARTICLE",
 });
 
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-
-graph.addEdge({
-  from: "publisher-2",
-  to: "reporter-4",
-  prompt: `Evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
-You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
-
-Evaluation criteria:
-- Depth and accuracy of research (researcher)
-- Quality and usefulness of feedback (reviewer)
-- Article writing completeness (reporter)
-- Thoroughness of editing and review (director)
-- Quality of final publication (publisher)
-
-Express the contribution percentage for each role and distribute 100 USDC accordingly.
-Example format:
-researcher: 30% (30 USDC)
-reviewer: 20% (20 USDC)
-reporter: 25% (25 USDC)
-director: 15% (15 USDC)
-publisher: 10% (10 USDC)
-
-<Researcher's Contribution>
-^MARKET_RESEARCH^
-
-<Reviewer's Article Guide>
-^ARTICLE_GUIDE^
-
-<Reporter's Article Draft (My work)>
-^ARTICLE_DRAFT^
-
-<Reviewer's Feedback>
-^MANAGER_FEEDBACK^
-
-<Director's Approval>
-^DIRECTOR_APPROVAL^
-
-<Publisher's Published Article>
-^PUBLISHED_ARTICLE^
-`,
-  memoryId: "CONTRIBUTION_DISTRIBUTION",
-});
-
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
 graph.setEntryPoint(
   "researcher-1",
@@ -337,7 +248,7 @@ graph.setEntryPoint(
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
 
 task
-  .runTask("Please write a news article about Ethereum ETF.")
+  .runTask("Please write a news article about Ethereum ETH.")
   .then((result) => {
     fs.writeFileSync("result.html", result);
     return task.exportMemory();

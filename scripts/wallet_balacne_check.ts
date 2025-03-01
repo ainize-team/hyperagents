@@ -20,6 +20,9 @@ async function main() {
 
   let balance = await wallet.listBalances();
   console.log(balance);
+
+  const privateKey = address.export();
+  console.log(privateKey);
 }
 
 main();
