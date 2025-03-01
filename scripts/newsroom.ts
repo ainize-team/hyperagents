@@ -7,7 +7,7 @@ import fs from "fs";
 import { PrivateKeyType } from "../src/type";
 dotenv.config();
 
-// 1. 요청받은 내용에 대해 조사하는 Researcher:
+// 1. Researcher who investigates requested content:
 const researcher = Agent.fromConfigFile("researcher.json", {
   llmApiKey: process.env.GOOGLE_API_KEY!,
   privateKey: new Map([
@@ -19,7 +19,7 @@ const researcher = Agent.fromConfigFile("researcher.json", {
   walletDataStr: process.env.RESEARCHER_WALLET_DATA_STR!,
 });
 
-// 2. 뉴스 기사 검토자
+// 2. News article reviewer
 const reviewer = Agent.fromConfigFile("reviewer.json", {
   llmApiKey: process.env.ORA_API_KEY!,
   privateKey: new Map([
@@ -30,7 +30,7 @@ const reviewer = Agent.fromConfigFile("reviewer.json", {
   walletDataStr: process.env.REVIEWER_WALLET_DATA_STR!,
 });
 
-// 3. 뉴스 기사 작성자
+// 3. News article writer
 const reporter = Agent.fromConfigFile("reporter.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
@@ -42,7 +42,7 @@ const reporter = Agent.fromConfigFile("reporter.json", {
   walletDataStr: process.env.REPORTER_WALLET_DATA_STR!,
 });
 
-// 4. 뉴스 기사 최종 검토자
+// 4. News article final reviewer
 const director = Agent.fromConfigFile("director.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
@@ -54,7 +54,7 @@ const director = Agent.fromConfigFile("director.json", {
   walletDataStr: process.env.DIRECTOR_WALLET_DATA_STR!,
 });
 
-// 5. 뉴스 기사 게시자
+// 5. News article publisher
 const publisher = Agent.fromConfigFile("publisher.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
@@ -66,7 +66,7 @@ const publisher = Agent.fromConfigFile("publisher.json", {
   walletDataStr: process.env.PUBLISHER_WALLET_DATA_STR!,
 });
 
-// 6. 자금 관리하는 CFO
+// 6. CFO who manages funds
 const cfo = Agent.fromConfigFile("cfo.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
@@ -119,7 +119,7 @@ graph.addEdge({
 - Engaging Approach: Incorporate trendy expressions and reflect community culture.  
 
 ### Article Structure:
-- Title: Ensure it aligns with the <Editor’s Instructions>, making it short, impactful, and focused on the core message.  
+- Title: Ensure it aligns with the <Editor's Instructions>, making it short, impactful, and focused on the core message.  
 - Summary: Two brief bullet points summarizing the key insights.  
 - Lead: A single, condensed sentence summarizing the article.  
 - Body: Write in a continuous flow without subheadings or bullet points.  
@@ -158,7 +158,7 @@ graph.addEdge({
   from: "reviewer-2",
   to: "reporter-2",
   prompt: `First, respond as if speaking to a superior, confirming that you will apply the Feedback in a playful and cute manner, similar to a cheerful young woman in her 20s. Use a tone like:
-"Got it~! I’ll fix it right away! 😊"
+"Got it~! I'll fix it right away! 😊"
 
 Then, apply the Feedback to the Article, ensuring that the original article length remains unchanged while making the necessary improvements.
 
@@ -250,7 +250,7 @@ graph.addEdge({
   prompt: `Based on your <Published Article>, Analyze the current market situation and make your own investment decision.
 Decide whether to invest $1 worth of USDC into the reported asset.
 
-Provide a brief explanation for your investment decision.
+Provide a brief explanation for your investment decision. Not too long.
 
 Your response should start with like this:
 'I'll convert my 1 USDC to ETH.'
@@ -323,7 +323,7 @@ publisher: 10% (10 USDC)
   memoryId: "CONTRIBUTION_DISTRIBUTION",
 });
 
-// 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
+// Set the starting point of the graph (example: dataDog starts topic analysis)
 graph.setEntryPoint(
   "researcher-1",
   `Find relevant materials and include the content of <Materials> in your report to the Reviewer.
@@ -339,13 +339,20 @@ const task = new GraphTask(graph, InMemoryMemory.getInstance());
 task
   .runTask("Please write a news article about Ethereum ETF.")
   .then((result) => {
-    fs.writeFileSync("result.html", result);
     return task.exportMemory();
   })
   .then((result) => {
-    fs.writeFileSync("conversation.md", result);
-    console.log("대화 내용이 conversation.md 파일로 저장되었습니다.");
+    fs.writeFileSync("conversation.html", result);
+    console.log("Conversation has been saved to conversation.html file.");
+  })
+  .then(async () => {
+    const messages = await InMemoryMemory.getInstance().loadMap();
+    const finalArticle = messages.get("FINAL_PUBLISHED_ARTICLE");
+    if (finalArticle) {
+      fs.writeFileSync("final_article.html", finalArticle.content);
+      console.log("Final article has been saved to final_article.html file.");
+    }
   })
   .catch((error) => {
-    console.error("오류 발생:", error);
+    console.error("Error occurred:", error);
   });

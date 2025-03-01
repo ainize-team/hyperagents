@@ -80,11 +80,11 @@ class Agent {
       return memoryData?.content || memoryId;
     });
 
-    console.log("########################");
-    console.log(this.name);
+    console.log("### Agent: ", this.name);
     // console.log("processedInput: ", processedInput);
 
     const output = await this.executeLLM(processedInput);
+    console.log("### Agent output: ", output);
     if (functions) {
       this.functionHandle(functions, output);
     }
@@ -147,16 +147,16 @@ class Agent {
 
   private async vote(output: string): Promise<void> {
     try {
-    const proposalId = extractString(output, "proposalId");
-    const isAgree = output.trim().endsWith("I Agree.");
-    if (!isAgree) {
-      console.log(`**agent ${this.name} disagreed.`);
-      return;
-    }
-    if (this.privateKey?.has(PrivateKeyType.ETH)) {
-      const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
-      const truncatedKey = ethPrivateKey?.slice(0, 6) + "...";
-      console.log(
+      const proposalId = extractString(output, "proposalId");
+      const isAgree = output.trim().endsWith("I Agree.");
+      if (!isAgree) {
+        console.log(`**agent ${this.name} disagreed.`);
+        return;
+      }
+      if (this.privateKey?.has(PrivateKeyType.ETH)) {
+        const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
+        const truncatedKey = ethPrivateKey?.slice(0, 6) + "...";
+        console.log(
           `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`
         );
       }
@@ -202,13 +202,19 @@ class Agent {
         throw new Error("Private key is not set");
       }
       const contract = await getDHAOContract(privateKey);
-      
+
       const proposalId = extractString(output, "proposalId");
       const contributors = extractArray(output, "contributors");
       const allocatedAmounts = extractArray(output, "allocatedAmounts");
 
-      await (contract as any).createTrustGameByJobOwner(proposalId, contributors, allocatedAmounts);
-      console.log(`**agent ${this.name} created trust game for proposal:${proposalId}`);
+      await (contract as any).createTrustGameByJobOwner(
+        proposalId,
+        contributors,
+        allocatedAmounts
+      );
+      console.log(
+        `**agent ${this.name} created trust game for proposal:${proposalId}`
+      );
     } catch (error) {
       console.error(`**agent ${this.name} failed to create trust game:`, error);
     }
@@ -221,12 +227,14 @@ class Agent {
         throw new Error("Private key is not set");
       }
       const contract = await getDHAOContract(privateKey);
-      
+
       const proposalId = extractString(output, "proposalId");
       const paybackAmount = extractString(output, "payback");
-    
+
       await (contract as any).paybackedByContributor(proposalId, paybackAmount);
-      console.log(`**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`);
+      console.log(
+        `**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`
+      );
     } catch (error) {
       console.error(`**agent ${this.name} failed to sign payback:`, error);
     }
