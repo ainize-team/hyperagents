@@ -285,13 +285,12 @@ const task = new GraphTask(graph, InMemoryMemory.getInstance());
 task
   .runTask("Please allocate the USDC to the participants.")
   .then((result) => {
-    fs.writeFileSync("result.html", result);
     return task.exportMemory();
   })
   .then((result) => {
-    fs.writeFileSync("conversation.md", result);
-    console.log("대화 내용이 conversation.md 파일로 저장되었습니다.");
+    fs.writeFileSync("conversation.html", result);
+    console.log("Conversation has been saved to conversation.html file.");
   })
   .catch((error) => {
-    console.error("오류 발생:", error);
+    console.error("Error occurred:", error);
   });

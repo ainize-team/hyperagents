@@ -248,7 +248,7 @@ graph.setEntryPoint(
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
 
 task
-  .runTask("Please write a news article about Ethereum ETH.")
+  .runTask("Please write a news article about Ethereum ETF.")
   .then((result) => {
     fs.writeFileSync("result.html", result);
     return task.exportMemory();
