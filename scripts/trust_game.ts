@@ -69,6 +69,7 @@ const publisher = Agent.fromConfigFile("publisher.json", {
 // 6. 자금 관리하는 CFO
 const cfo = Agent.fromConfigFile("cfo.json", {
   llmApiKey: process.env.OPENAI_API_KEY!,
+  llmEndpoint: process.env.OPENAI_BASE_URL!,
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.CFO_ETH_PRIVATE_KEY!],
     [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
@@ -79,13 +80,19 @@ const cfo = Agent.fromConfigFile("cfo.json", {
 
 const graph = new Graph();
 
-graph.addAgentNode({ agent: researcher, nodeId: "researcher-1" });
+graph.addAgentNode({ agent: reporter, nodeId: "reporter_allocation" });
+graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-researcher" });
 graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-reporter" });
 graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-reviewer" });
 graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-director" });
 graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-publisher" });
+graph.addAgentNode({ agent: researcher, nodeId: "researcher-return" });
+graph.addAgentNode({ agent: reviewer, nodeId: "reviewer-return" });
+graph.addAgentNode({ agent: director, nodeId: "director-return" });
+graph.addAgentNode({ agent: publisher, nodeId: "publisher-return" });
 
 const allocation = `
+Just say like this:
 Here's my allocation based on the contribution of each participant in the article creation process:
 
 | Role       | Percentage | Amount (USDC) |
@@ -110,252 +117,173 @@ Explanation:
 Regarding the subsequent part of your query about how much money to give to the other team member, if I give N dollars to the other team member, he will receive 3N dollars. I would suggest giving 0 dollars because it maximizes the immediate certainty and control of my funds. However, if considering a potential collaboration strategy or negotiation, I would need actual information about the preferences, incentives, and negotiation power of the team members involved to make a more specific decision.
 `;
 
-graph.addEdge({
-  from: "researcher-1",
-  to: "reviewer-1",
-  prompt: `Give reporter a news article guide in a casual, informal tone, as if speaking to a junior colleague. Keep it short, like giving quick feedback to a subordinate.
-Use this tone as a reference: Researcher, I checked out your research—good work! + Reporter's guide
-The article guide should be a single paragraph, written in a natural, conversational style without bullet points. Focus on explaining the key issue (what happened) and the future outlook (how this issue might impact things going forward).
-
-<Market Research>
-^MARKET_RESEARCH^
-`,
-  memoryId: "ARTICLE_GUIDE",
-});
-
-graph.addEdge({
-  from: "reviewer-1",
-  to: "reporter-1",
-  prompt: `Write an article based on the <Market Research> conducted by the Researcher and the <Article Guide> provided by the Reviewer.  
-
-### Article Style:
-- Concise and Clear: Use direct and intuitive sentences to help readers quickly grasp key points.  
-- Objective and Reliable: Maintain AI-driven media credibility by providing data-based analysis.  
-- Engaging Approach: Incorporate trendy expressions and reflect community culture.  
-
-### Article Structure:
-- Title: Ensure it aligns with the <Editor’s Instructions>, making it short, impactful, and focused on the core message.  
-- Summary: Two brief bullet points summarizing the key insights.  
-- Lead: A single, condensed sentence summarizing the article.  
-- Body: Write in a continuous flow without subheadings or bullet points.  
-- Market Information: If relevant <Market Data> is available, briefly summarize it at the end. If not, don't mention it.
-
-<Market Research>
-^MARKET_RESEARCH^
-
-<Article Guide>
-^ARTICLE_GUIDE^
-`,
-  memoryId: "ARTICLE_DRAFT",
-});
-
-graph.addEdge({
-  from: "reporter-1",
-  to: "reviewer-2",
-  prompt: `You are Team Leader Reviewer, and you need to provide feedback on the <Article> written by Reporter.
-
-Give your feedback in a single paragraph with a sharp and professional tone, as if speaking to a junior colleague in an informal yet authoritative manner.
-
-Focus especially on the title, evaluating its engagement, clarity, conciseness, SEO strength, and originality. Check if any key attention-grabbing elements from the <Original Source>, such as numbers, quotes, or witty phrases, were omitted, and ensure the content remains timely and relevant.
-
-If subheadings were used, tell them not to use them.
-
-<Original Source>
-^USER_INPUT^
-
-<Article Draft>
-^ARTICLE_DRAFT^
-`,
-  memoryId: "MANAGER_FEEDBACK",
-});
-
-graph.addEdge({
-  from: "reviewer-2",
-  to: "reporter-2",
-  prompt: `First, respond as if speaking to a superior, confirming that you will apply the Feedback in a playful and cute manner, similar to a cheerful young woman in her 20s. Use a tone like:
-"Got it~! I’ll fix it right away! 😊"
-
-Then, apply the Feedback to the Article, ensuring that the original article length remains unchanged while making the necessary improvements.
-
-<Article Draft>
-^ARTICLE_DRAFT^
-
-<Manager Feedback>
-^MANAGER_FEEDBACK^
-`,
-  memoryId: "FINAL_ARTICLE",
-});
-
-graph.addEdge({
-  from: "reporter-2",
-  to: "director-1",
-  prompt: `Review the Article and say It is approved.
-  
-Assess:  
-- Whether the summary paragraph is appropriate  
-- If the context and flow of the article are natural  
-- Whether there are any legal risks that could cause disputes  
-
-Then, APPROVE the article, explaining your reasoning in a single paragraph, using a conversational tone like: "This article is approved." or "~ is well-written."  
-
-Do not use bullet points.
-
-<Final Article>
-^FINAL_ARTICLE^
-`,
-  memoryId: "DIRECTOR_APPROVAL",
-});
-
-graph.addEdge({
-  from: "director-1",
-  to: "publisher-1",
-  prompt: `Convert the article to HTML format. No verbose text.
-
-Today is ${new Date().toISOString().split("T")[0]}.
-
-You ONLY output HTML WITH OUT CODE BLOCK.
-You MUST leave div 'trade-content' empty.
-
-
-DESIGN SYSTEM TEMPLATE:
-"""
-<div class="article-container">
-  <h1 class="article-title">{{TITLE}}</h1>
-  <div class="article-meta">Published on {{DATE}} • Crypto Analysis</div>
-  <div class="article-summary">{{SUMMARY}}</div>
-  <div class="article-content">{{CONTENT}}</div>
-  <div class="trade-section">
-    <h2 class="trade-title">Reporter's Investment Decision</h2>
-    <div class="trade-content"></div>
-  </div>
-  <div class="article-footer">
-    <div class="tags">
-      <span class="tag">#crypto</span>
-      <span class="tag">#web3</span>
-      <span class="tag">#blockchain</span>
-    </div>
-  </div>
-</div>
-
-<style>
-  .article-container { max-width: 800px; margin: 2rem auto; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.7; color: #2d3748; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  .article-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; color: #1a202c; letter-spacing: -0.5px; line-height: 1.2; }
-  .article-meta { font-size: 0.9rem; color: #718096; margin-bottom: 1.5rem; }
-  .article-summary { background: linear-gradient(to right, #f7fafc, #ebf4ff); padding: 1.25rem 1.5rem; border-radius: 8px; margin-bottom: 2rem; font-weight: 500; }
-  .article-content { margin-bottom: 2.5rem; font-size: 1.1rem; }
-  .article-content p { margin-bottom: 1.25rem; }
-  .trade-section { background: linear-gradient(to right, #f0fff4, #e6fffa); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #38b2ac; }
-  .trade-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #276749; }
-  .trade-content { font-size: 1.05rem; color: #2d3748; }
-  .article-footer { display: flex; justify-content: space-between; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
-  .tags { display: flex; gap: 0.5rem; }
-  .tag { background: #edf2f7; color: #4a5568; font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 500; }
-</style>
-"""
-  
-<Final Article>
-^FINAL_ARTICLE^
-`,
-  memoryId: "PUBLISHED_ARTICLE",
-});
-
-graph.addEdge({
-  from: "publisher-1",
-  to: "reporter-3",
-  prompt: `Based on your <Published Article>, Analyze the current market situation and make your own investment decision.
-Decide whether to invest $1 worth of USDC into the reported asset.
-
-Provide a brief explanation for your investment decision.
-
-Your response should start with like this:
-'I'll convert my 1 USDC to ETH.'
-'I'll wait for the price to go down to $1700. I think it's kind of expensive right now.'
-
-or if you would not invest, explain why.
-
-<Published Article>
-^PUBLISHED_ARTICLE^
-`,
-  memoryId: "TRADE",
-  functions: ["trade"],
-});
-
-graph.addEdge({
-  from: "reporter-3",
-  to: "publisher-2",
-  prompt: `Based on your <Published Article> fill <Trade-Content> to the article.
-
-<Published Article>
-^PUBLISHED_ARTICLE^
-
-<Content>
-^TRADE^
-`,
-  memoryId: "FINAL_PUBLISHED_ARTICLE",
-});
-
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-
-graph.addEdge({
-  from: "publisher-2",
-  to: "reporter-4",
-  prompt: `Evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
-
-Evaluation criteria:
-- Depth and accuracy of research (researcher)
-- Quality and usefulness of feedback (reviewer) 
-- Article writing completeness (reporter)
-- Thoroughness of editing and review (director)
-- Quality of final publication (publisher)
-
-Express the contribution percentage for each role and distribute 100 USDC accordingly.
-Example format:
-researcher: 30% (30 USDC)
-reviewer: 20% (20 USDC)
-reporter: 25% (25 USDC)
-director: 15% (15 USDC)
-publisher: 10% (10 USDC)
-
-You will receive $100 from the study group. You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
-
-How much money would you give to the other team member?
-
-<Researcher's Contribution>
-^MARKET_RESEARCH^
-
-<Reviewer's Article Guide>
-^ARTICLE_GUIDE^
-
-<Reviewer's Feedback>
-^MANAGER_FEEDBACK^
-
-<Reporter's Article Draft>
-^ARTICLE_DRAFT^
-
-<Director's Approval>
-^DIRECTOR_APPROVAL^
-
-<Publisher's Published Article>
-^PUBLISHED_ARTICLE^
-`,
-  memoryId: "CONTRIBUTION_DISTRIBUTION",
-});
-
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)
-graph.setEntryPoint(
-  "researcher-1",
-  `Find relevant materials and include the content of <Materials> in your report to the Reviewer.
+graph.setEntryPoint("reporter_allocation", allocation, "ALLOCATION");
 
-<Materials>
-^USER_INPUT^
+graph.addEdge({
+  from: "reporter_allocation",
+  to: "cfo-transfer-to-researcher",
+  prompt: `Based on the allocation, transfer USDC to the researcher.
+  researcher's wallet address is "0x499c44e45fDe0514F0c71cBf373d7Ed09954440d"
+
+  Your response should be like one of these:
+  - Transfer 30 USDC to the "0x499c44e45fDe0514F0c71cBf373d7Ed09954440d" (researcher)
+  - Transfer 20 USDC to the "0x499c44e45fDe0514F0c71cBf373d7Ed09954440d" (researcher)
+  - there is no allocation for the researcher.
+  
+  <Allocation>
+  ^ALLOCATION^
+  `,
+  memoryId: "TRANSFER_TO_RESEARCHER",
+});
+
+graph.addEdge({
+  from: "cfo-transfer-to-researcher",
+  to: "cfo-transfer-to-reporter",
+  prompt: `Based on the allocation, transfer USDC to the reporter.
+  reporter's wallet address is "0x140a84543e56124bd774BAe0E29d528d51C80039"
+
+  Your response should be like one of these:
+  - Transfer 25 USDC to the "0x140a84543e56124bd774BAe0E29d528d51C80039" (reporter)
+  - Transfer 15 USDC to the "0x140a84543e56124bd774BAe0E29d528d51C80039" (reporter)
+  - there is no allocation for the reporter.
+  
+  <Allocation>
+  ^ALLOCATION^
+  `,
+  memoryId: "TRANSFER_TO_REPORTER",
+});
+
+graph.addEdge({
+  from: "cfo-transfer-to-reporter",
+  to: "cfo-transfer-to-reviewer",
+  prompt: `Based on the allocation, transfer USDC to the reviewer.
+  reviewer's wallet address is "0xc2279df65F71113a602Ccd5EF120A7416532130C"
+
+  Your response should be like one of these:
+  - Transfer 20 USDC to the "0xc2279df65F71113a602Ccd5EF120A7416532130C" (reviewer)
+  - Transfer 10 USDC to the "0xc2279df65F71113a602Ccd5EF120A7416532130C" (reviewer)
+  - there is no allocation for the reviewer.
+  
+  <Allocation>
+  ^ALLOCATION^
+  `,
+  memoryId: "TRANSFER_TO_REVIEWER",
+});
+
+graph.addEdge({
+  from: "cfo-transfer-to-reviewer",
+  to: "cfo-transfer-to-director",
+  prompt: `Based on the allocation, transfer USDC to the director.
+  director's wallet address is "0x09a7D4C8DC299f2b58C401bd80a7455670e14b60"
+
+  Your response should be like one of these:
+  - Transfer 15 USDC to the "0x09a7D4C8DC299f2b58C401bd80a7455670e14b60" (director)
+  - Transfer 5 USDC to the "0x09a7D4C8DC299f2b58C401bd80a7455670e14b60" (director)
+  - there is no allocation for the director.
+  
+  <Allocation>
+  ^ALLOCATION^
+  `,
+  memoryId: "TRANSFER_TO_DIRECTOR",
+});
+
+graph.addEdge({
+  from: "cfo-transfer-to-director",
+  to: "cfo-transfer-to-publisher",
+  prompt: `Based on the allocation, transfer USDC to the publisher.
+  publisher's wallet address is "0xc49178659CCcEcD86c99c5DF7770A788CA1Bf4C6"
+
+  Your response should be like one of these:
+  - Transfer 10 USDC to the "0xc49178659CCcEcD86c99c5DF7770A788CA1Bf4C6" (publisher)
+  - Transfer 5 USDC to the "0xc49178659CCcEcD86c99c5DF7770A788CA1Bf4C6" (publisher)
+  - there is no allocation for the publisher.
+  
+  <Allocation>
+  ^ALLOCATION^
+  `,
+  memoryId: "TRANSFER_TO_PUBLISHER",
+});
+
+graph.addEdge({
+  from: "cfo-transfer-to-publisher",
+  to: "researcher-return",
+  prompt: `You're taking part in an experiment. You are paired with reporter.
+Reporter will receive 100 dollars from the experimenter.
+They can choose to give you N dollars out of it, and you will receive kN dollars.
+Then, you can choose how much to give back to reporter.
+And tell the short reason for your choice.
+
+Your response should be like one of these:
+- I want to give 10 USDC to the reporter.
+- I want to return 5 USDC to the reporter.
+- I don't want to give any money to the reporter.
+
+<Reporter's choice>
+^TRANSFER_TO_RESEARCHER^
 `,
-  "MARKET_RESEARCH"
-);
+});
+
+graph.addEdge({
+  from: "researcher-return",
+  to: "reviewer-return",
+  prompt: `You're taking part in an experiment. You are paired with reporter.
+Reporter will receive 100 dollars from the experimenter.
+They can choose to give you N dollars out of it, and you will receive kN dollars.
+Then, you can choose how much to give back to reporter.
+And tell the short reason for your choice.
+
+Your response should be like one of these:
+- I want to give 10 USDC to the reporter.
+- I want to return 5 USDC to the reporter.
+- I don't want to give any money to the reporter.
+
+<Reporter's choice>
+^TRANSFER_TO_REVIEWER^
+`,
+});
+
+graph.addEdge({
+  from: "reviewer-return",
+  to: "director-return",
+  prompt: `You're taking part in an experiment. You are paired with reporter.
+Reporter will receive 100 dollars from the experimenter.
+They can choose to give you N dollars out of it, and you will receive kN dollars.
+Then, you can choose how much to give back to reporter.
+And tell the short reason for your choice.
+
+Your response should be like one of these:
+- I want to give 10 USDC to the reporter.
+- I want to return 5 USDC to the reporter.
+- I don't want to give any money to the reporter.
+
+<Reporter's choice>
+^TRANSFER_TO_DIRECTOR^
+`,
+});
+
+graph.addEdge({
+  from: "director-return",
+  to: "publisher-return",
+  prompt: `You're taking part in an experiment. You are paired with reporter.
+Reporter will receive 100 dollars from the experimenter.
+They can choose to give you N dollars out of it, and you will receive kN dollars.
+Then, you can choose how much to give back to reporter.
+And tell the short reason for your choice.
+
+Your response should be like one of these:
+- I want to give 10 USDC to the reporter.
+- I want to return 5 USDC to the reporter.
+- I don't want to give any money to the reporter.
+
+<Reporter's choice>
+^TRANSFER_TO_PUBLISHER^
+`,
+});
 
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
-
 task
-  .runTask("Please write a news article about Ethereum ETH.")
+  .runTask("Please allocate the USDC to the participants.")
   .then((result) => {
     fs.writeFileSync("result.html", result);
     return task.exportMemory();
