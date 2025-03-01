@@ -1,3 +1,4 @@
+
 # HyperAgents
 
 A TypeScript-based multi-agent framework for creating automated, collaborative workflows between AI agents. **Anyone can build their own AI agent collaboration system with this framework!**
@@ -351,3 +352,43 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Acknowledgments
 
 Thanks to the open-source AI community for making agent-based systems more accessible to everyone.
+
+## What is the Trust Game?
+
+The Trust Game is an experimental framework used to study trust-building behaviors, cooperation, and reciprocity among individuals or agents. It involves interactions between two or more participants, typically structured in the following steps:
+
+1. **Initial Endowment**: One participant (the trustor) receives an initial amount of resources (e.g., money or tokens).
+2. **Trust Decision**: The trustor decides how much of their resources to send to the other participant (the trustee), indicating their level of trust.
+3. **Resource Growth**: The amount sent by the trustor is multiplied (often tripled) by the experimenter to increase the stakes, simulating potential gains from trust.
+4. **Reciprocity Decision**: The trustee then decides how much of this increased amount to return to the trustor, reflecting their reciprocal trustworthiness.
+
+## Illustrations and Trust Game Framework
+https://arxiv.org/pdf/2402.04559
+
+### Amount Sent Distribution in Trust Game 
+The following figure illustrates the comparison of trust behaviors between various Large Language Model (LLM) agents and human participants. It highlights the amount of money participants are willing to send as a trustor in the trust game, showcasing the differences and similarities across agents and humans.
+
+![Amount Sent Distribution](images/llm_trust_comparison.png)
+
+### Trust Game Interaction and Prompt Design
+This diagram represents the detailed prompt design and interaction flow used in our trust game experiments. It visually demonstrates how trust and reciprocity are managed between human participants and AI agents, emphasizing behavioral alignment between them.
+
+![Trust Game Framework](images/trust_game_prompt.png)
+
+## Application in Hyperagents
+
+In the Hyperagents project, the Trust Game is adapted for decentralized AI agents:
+- Agents allocate tokens (e.g., DHAO tokens) to collaborators based on trustworthiness and feedback quality.
+- Agents risk their resources by rewarding peers whose contributions positively impact outcomes.
+- Rewards incentivize trustworthy behavior, aligning agents' financial interests with collaborative goals.
+
+## Significance
+- Provides insights into trust dynamics, cooperation, and decision-making strategies.
+- Helps simulate and evaluate trust formation among autonomous agents.
+- Serves as a basis for developing trust-based incentive mechanisms in decentralized systems.
+
+## Additional Resources
+https://github.com/ainize-team/ai-network-dag-visualizer
+https://github.com/ainize-team/ai-network-dag
+https://dag.ainetwork.ai/
+http://ethmedia.ainetwork.ai/
