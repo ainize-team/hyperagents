@@ -158,6 +158,7 @@ class Agent {
   }
 
   private async trade(output: string): Promise<void> {
+    console.log("trade result: ", output);
     if (this.llm !== LLMType.GPT4O && this.llm !== LLMType.GPT4OMINI) {
       return;
     }
@@ -170,6 +171,7 @@ class Agent {
       this.privateKey?.has(PrivateKeyType.CDPKEY) &&
       this.privateKey.has(PrivateKeyType.CDPNAME)
     ) {
+      console.log("trade with cdp");
       const cdpApiKeyName = this.privateKey.get(PrivateKeyType.CDPNAME);
       const cdpApiKeyPrivateKey = this.privateKey.get(PrivateKeyType.CDPKEY);
 

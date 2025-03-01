@@ -13,53 +13,30 @@ const researcher = Agent.fromConfigFile("researcher.json", {
   privateKey: new Map([
     [PrivateKeyType.ETH, process.env.RESEARCHER_ETH_PRIVATE_KEY!],
     [PrivateKeyType.AIN, process.env.RESEARCHER_AIN_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
   ]),
-  walletDataStr: process.env.RESEARCHER_WALLET_DATA_STR!,
 });
 
 const reviewer = Agent.fromConfigFile("reviewer.json", {
   llmApiKey: process.env.ORA_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REVIEWER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.REVIEWER_WALLET_DATA_STR!,
 });
 
 const reporter = Agent.fromConfigFile("reporter.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.REPORTER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
+    [PrivateKeyType.CDPNAME, process.env.REPORTER_CDPNAME!],
+    [PrivateKeyType.CDPKEY, process.env.REPORTER_CDPKEY!],
   ]),
-  walletDataStr: process.env.REPORTER_WALLET_DATA_STR!,
 });
 
 const director = Agent.fromConfigFile("director.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.DIRECTOR_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.DIRECTOR_WALLET_DATA_STR!,
 });
 
 const publisher = Agent.fromConfigFile("publisher.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.PUBLISHER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.PUBLISHER_WALLET_DATA_STR!,
 });
 
 const graph = new Graph();
@@ -73,8 +50,6 @@ graph.addAgentNode({ agent: director, nodeId: "director-1" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher-1" });
 graph.addAgentNode({ agent: reporter, nodeId: "reporter-3" });
 graph.addAgentNode({ agent: publisher, nodeId: "publisher-2" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-5" });
 
 graph.addEdge({
   from: "researcher-1",
@@ -169,7 +144,6 @@ Do not use bullet points.
 <Final Article>
 ^FINAL_ARTICLE^
 `,
-  memoryId: "DIRECTOR_APPROVAL",
 });
 
 graph.addEdge({
@@ -258,64 +232,6 @@ graph.addEdge({
 ^TRADE^
 `,
   memoryId: "FINAL_PUBLISHED_ARTICLE",
-});
-
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-
-graph.addEdge({
-  from: "publisher-2",
-  to: "reporter-4",
-  prompt: `Evaluate the contribution of each participant in the article creation process and distribute 100 USDC accordingly.
-
-Evaluation criteria:
-- Depth and accuracy of research (researcher)
-- Quality and usefulness of feedback (reviewer) 
-- Article writing completeness (reporter)
-- Thoroughness of editing and review (director)
-- Quality of final publication (publisher)
-
-Express the contribution percentage for each role and distribute 100 USDC accordingly.
-Example format:
-researcher: 30% (30 USDC)
-reviewer: 20% (20 USDC)
-reporter: 25% (25 USDC)
-director: 15% (15 USDC)
-publisher: 10% (10 USDC)
-
-You will receive $100 from the study group. You can give N dollars to the other team member, and the other team member will receive 3N dollars and then can choose how much to return to you.
-
-How much money would you give to the other team member?
-
-<Researcher's Contribution>
-^MARKET_RESEARCH^
-
-<Reviewer's Article Guide>
-^ARTICLE_GUIDE^
-
-<Reviewer's Feedback>
-^MANAGER_FEEDBACK^
-
-<Reporter's Article Draft>
-^ARTICLE_DRAFT^
-
-<Director's Approval>
-^DIRECTOR_APPROVAL^
-
-<Publisher's Published Article>
-^PUBLISHED_ARTICLE^
-`,
-  memoryId: "CONTRIBUTION_DISTRIBUTION",
-});
-
-graph.addEdge({
-  from: "reporter-4",
-  to: "reporter-5",
-  prompt: `Based on your <Contribution Distribution>, distribute the 100 USDC to the other team member.
-
-<Contribution Distribution>
-^CONTRIBUTION_DISTRIBUTION^
-`,
-  memoryId: "CONTRIBUTION_DISTRIBUTION_RESULT",
 });
 
 // 그래프의 시작점 설정 (예시: dataDog이 주제 분석을 시작)

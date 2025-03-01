@@ -6,8 +6,8 @@ dotenv.config();
 async function main() {
   const responses = await runCoinbaseAgentkitWithAzureOpenAI({
     openaiApiKey: process.env.OPENAI_API_KEY || "",
-    cdpApiKeyName: process.env.RESEARCHER_CDPNAME || "",
-    cdpApiKeyPrivateKey: process.env.RESEARCHER_CDPKEY || "",
+    cdpApiKeyName: process.env.REPORTER_CDPNAME || "",
+    cdpApiKeyPrivateKey: process.env.REPORTER_CDPKEY || "",
     networkId: "base-mainnet",
     message: "Convert 0.006 ETH to USDC",
   });
@@ -21,3 +21,4 @@ main().catch((error) => {
 });
 
 // "Check the balance of every asset in the wallet"
+// "Convert 0.006 ETH to USDC"

@@ -48,7 +48,7 @@ export interface AgentOptions {
   cdpApiKeyPrivateKey: string;
   message?: string;
   networkId?: string;
-  walletDataFile?: string;
+  walletDataStr?: string;
   model?: string;
   autonomous?: boolean;
   azureOptions?: {
@@ -90,7 +90,7 @@ export async function runCoinbaseAgentkitWithAzureOpenAI(
     cdpApiKeyPrivateKey,
     message,
     networkId = "base-mainnet",
-    walletDataFile = "wallet_data.txt",
+    walletDataStr,
     autonomous = false,
     azureOptions = {
       instanceName: "gpt-4o-ptu-m",
@@ -108,22 +108,15 @@ export async function runCoinbaseAgentkitWithAzureOpenAI(
       azureOpenAIApiVersion: azureOptions.apiVersion,
     });
 
-    let walletDataStr: string | null = null;
-
-    // 기존 지갑 데이터가 있으면 읽기
-    if (fs.existsSync(walletDataFile)) {
-      try {
-        walletDataStr = fs.readFileSync(walletDataFile, "utf8");
-      } catch (error) {
-        console.error("지갑 데이터 읽기 오류:", error);
-      }
+    if (!walletDataStr) {
+      throw new Error("walletDataStr is required");
     }
 
     // CDP 지갑 제공자 설정
     const walletConfig = {
       apiKeyName: cdpApiKeyName,
       apiKeyPrivateKey: cdpApiKeyPrivateKey,
-      cdpWalletData: walletDataStr || undefined,
+      cdpWalletData: walletDataStr,
       networkId: networkId,
     };
 
@@ -168,13 +161,9 @@ export async function runCoinbaseAgentkitWithAzureOpenAI(
               faucet if you are on network ID 'base-sepolia'. If not, you can provide your wallet details and request 
               funds from the user. Before executing your first action, get the wallet details to see what network 
               you're on. If there is a 5XX (internal) HTTP error code, ask the user to try again later. Be concise and 
-              helpful with your responses. USDC's contract address is "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+              helpful with your responses. USDC's contract address is "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913. All the assets are on base-mainnet."
             `,
     });
-
-    // 지갑 데이터 저장
-    const exportedWallet = await walletProvider.exportWallet();
-    fs.writeFileSync(walletDataFile, JSON.stringify(exportedWallet));
 
     // 에이전트 응답 배열
     const responses: AgentResponse[] = [];
@@ -257,7 +246,7 @@ export class CoinbaseAgent {
    * @param {boolean} [autonomous=false] - 자율 모드 활성화 여부
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
-  
+
   async sendMessage(message: string, autonomous = false): Promise<string> {
     return runCoinbaseAgentkitWithAzureOpenAI({
       ...this.options,
@@ -272,7 +261,7 @@ export class CoinbaseAgent {
    * @param {string} [message] - 선택적 시작 메시지
    * @returns {Promise<AgentResponse[]>} 에이전트 응답 배열
    */
-  
+
   async runAutonomous(message?: string): Promise<string> {
     return this.sendMessage(
       message ||

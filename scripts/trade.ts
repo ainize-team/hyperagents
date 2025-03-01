@@ -16,8 +16,8 @@ const reporter = Agent.fromConfigFile("reporter.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
   privateKey: new Map([
-    [PrivateKeyType.CDPNAME, process.env.RESEARCHER_CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.RESEARCHER_CDPKEY!],
+    [PrivateKeyType.CDPNAME, process.env.REPORTER_CDPNAME!],
+    [PrivateKeyType.CDPKEY, process.env.REPORTER_CDPKEY!],
   ]),
 });
 
