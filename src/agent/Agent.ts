@@ -17,6 +17,7 @@ class Agent {
   private llmApiKey?: string;
   private memoryType: MemoryType;
   private privateKey?: Map<PrivateKeyType, string>;
+  private walletDataStr?: string;
   private memory: Memory;
   private llmClient: ILLMClient;
 
@@ -29,7 +30,7 @@ class Agent {
     this.llmApiKey = config.llmApiKey;
     this.memoryType = config.memoryType;
     this.privateKey = config.privateKey;
-
+    this.walletDataStr = config.walletDataStr;
     if (this.memoryType === MemoryType.inMemory) {
       this.memory = InMemoryMemory.getInstance();
     } else {
@@ -174,11 +175,13 @@ class Agent {
       console.log("trade with cdp");
       const cdpApiKeyName = this.privateKey.get(PrivateKeyType.CDPNAME);
       const cdpApiKeyPrivateKey = this.privateKey.get(PrivateKeyType.CDPKEY);
+      const walletDataStr = this.walletDataStr;
 
       const response = await runCoinbaseAgentkitWithAzureOpenAI({
         openaiApiKey: this.llmApiKey,
         cdpApiKeyName: cdpApiKeyName!,
         cdpApiKeyPrivateKey: cdpApiKeyPrivateKey!,
+        walletDataStr: walletDataStr!,
         message: output,
       });
 

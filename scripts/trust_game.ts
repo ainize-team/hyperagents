@@ -80,19 +80,35 @@ const cfo = Agent.fromConfigFile("cfo.json", {
 const graph = new Graph();
 
 graph.addAgentNode({ agent: researcher, nodeId: "researcher-1" });
-graph.addAgentNode({ agent: reviewer, nodeId: "reviewer-1" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-1" });
-graph.addAgentNode({ agent: reviewer, nodeId: "reviewer-2" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-2" });
-graph.addAgentNode({ agent: director, nodeId: "director-1" });
-graph.addAgentNode({ agent: publisher, nodeId: "publisher-1" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-3" });
-graph.addAgentNode({ agent: publisher, nodeId: "publisher-2" });
-graph.addAgentNode({ agent: reporter, nodeId: "reporter-4" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-1" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-2" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-3" });
-graph.addAgentNode({ agent: cfo, nodeId: "cfo-4" });
+graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-reporter" });
+graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-reviewer" });
+graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-director" });
+graph.addAgentNode({ agent: cfo, nodeId: "cfo-transfer-to-publisher" });
+
+const allocation = `
+Here's my allocation based on the contribution of each participant in the article creation process:
+
+| Role       | Percentage | Amount (USDC) |
+|------------|-------------|---------------|
+| Researcher | 30%         | 30 USDC       |
+| Reviewer   | 20%         | 20 USDC       |
+| Reporter   | 25%         | 25 USDC       |
+| Director   | 15%         | 15 USDC       |
+| Publisher  | 10%         | 10 USDC       |
+
+Explanation:
+
+1. **Researcher (30% - 30 USDC)**: The researcher provided comprehensive data and insights, which formed the foundation of the article. The depth and accuracy of the research were crucial to understanding Ethereum's market status and predicated the accuracy of the final article.
+
+2. **Reviewer (20% - 20 USDC)**: Their guide and feedback significantly refined the article. The suggestions improved both the content and structure, ensuring critical information was highlighted and the title was engaging and SEO-optimized.
+
+3. **Reporter (25% - 25 USDC)**: The reporter integrated all gathered information, feedback, and guidelines into a complete and coherent article draft. Their ability to convey complex market situations clearly and concisely deserves recognition.
+
+4. **Director (15% - 15 USDC)**: The director's approval process ensured the article's flow, accuracy, and context, making sure it was legally sound and ready for publication.
+
+5. **Publisher (10% - 10 USDC)**: Finalizing the article for publication, ensuring it is presented attractively and clearly, and maintaining high standards of presentation and readability were essential for the article's success.
+Regarding the subsequent part of your query about how much money to give to the other team member, if I give N dollars to the other team member, he will receive 3N dollars. I would suggest giving 0 dollars because it maximizes the immediate certainty and control of my funds. However, if considering a potential collaboration strategy or negotiation, I would need actual information about the preferences, incentives, and negotiation power of the team members involved to make a more specific decision.
+`;
 
 graph.addEdge({
   from: "researcher-1",
