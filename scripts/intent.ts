@@ -42,41 +42,6 @@ const reporter = Agent.fromConfigFile("reporter.json", {
   walletDataStr: process.env.REPORTER_WALLET_DATA_STR!,
 });
 
-// 4. 뉴스 기사 최종 검토자
-const director = Agent.fromConfigFile("director.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.DIRECTOR_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.DIRECTOR_WALLET_DATA_STR!,
-});
-
-// 5. 뉴스 기사 게시자
-const publisher = Agent.fromConfigFile("publisher.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.PUBLISHER_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.PUBLISHER_WALLET_DATA_STR!,
-});
-
-// 6. 자금 관리하는 CFO
-const cfo = Agent.fromConfigFile("cfo.json", {
-  llmApiKey: process.env.OPENAI_API_KEY!,
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  privateKey: new Map([
-    [PrivateKeyType.ETH, process.env.CFO_ETH_PRIVATE_KEY!],
-    [PrivateKeyType.CDPNAME, process.env.CDPNAME!],
-    [PrivateKeyType.CDPKEY, process.env.CDPKEY!],
-  ]),
-  walletDataStr: process.env.CFO_WALLET_DATA_STR!,
-});
 
 const graph = new Graph();
 

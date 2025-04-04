@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
-import Agent from "../src/agent/Agent";
-import Graph from "../src/Graph";
-import InMemoryMemory from "../src/memory/InMemoryMemory";
-import GraphTask from "../src/GraphTask";
+import Agent from "../../src/agent/Agent";
+import Graph from "../../src/Graph";
+import InMemoryMemory from "../../src/memory/InMemoryMemory";
+import GraphTask from "../../src/GraphTask";
 import fs from "fs";
-import { PrivateKeyType } from "../src/type";
+import { PrivateKeyType } from "../../src/type";
 dotenv.config();
 
 // 1. Researcher who investigates requested content:
