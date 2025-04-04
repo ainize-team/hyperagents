@@ -1,4 +1,5 @@
 import Agent from "./agent/Agent";
+import IntentManagerAgent from "./agent/IntentManagerAgent";
 
 interface EdgeData {
   to: string;
@@ -10,7 +11,7 @@ interface EdgeData {
 
 class Graph {
   private readonly ENTRY_POINT_KEY = "ROOTNODE";
-  private node: Map<string, Agent>;
+  private node: Map<string, Agent | IntentManagerAgent>;
   private edge: Map<string, Map<string, EdgeData>>;
   constructor() {
     this.node = new Map();
@@ -25,8 +26,12 @@ class Graph {
     return entryPoint;
   }
 
-  setEntryPoint(name: string, prompt: string, memoryId?: string, functions?: string[]) {
-
+  setEntryPoint(
+    name: string,
+    prompt: string,
+    memoryId?: string,
+    functions?: string[]
+  ) {
     this.edge.get(this.ENTRY_POINT_KEY)?.set(name, {
       to: name,
       from: this.ENTRY_POINT_KEY,
@@ -36,7 +41,10 @@ class Graph {
     });
   }
 
-  addAgentNode(nodeconfig: { agent: Agent; nodeId: string }) {
+  addAgentNode(nodeconfig: {
+    agent: Agent | IntentManagerAgent;
+    nodeId: string;
+  }) {
     this.node.set(nodeconfig.nodeId, nodeconfig.agent);
   }
 
@@ -48,7 +56,7 @@ class Graph {
     }
   }
 
-  getNode(name: string) {
+  getNode(name: string): Agent | IntentManagerAgent {
     const agent = this.node.get(name);
     if (!agent) {
       throw new Error(`Agent ${name} not found`);
