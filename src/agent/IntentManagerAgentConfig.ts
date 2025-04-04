@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { Memory } from "../memory";
+import { MemoryType } from "../type";
 
 interface Intent {
   type: string;
@@ -7,11 +9,16 @@ interface Intent {
 }
 
 export interface IntentManagerConfig {
+  name: string;
+  validIntents: string[];
+
   embeddingApiKey?: string;
   embeddingEndpoint?: string;
   embeddingApiVersion?: string;
   embeddingDeploymentName?: string;
   intent?: Intent[];
+  memory?: Memory;
+  memoryType?: MemoryType;
 }
 
 export function isIntentManagerConfig(

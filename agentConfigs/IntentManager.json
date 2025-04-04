@@ -4,6 +4,7 @@
     "llm": "gpt-4o",
     "publicDesc": "IntentManager",
     "memoryType": "InMemory",
+    "validIntents": ["need routing"],
     "intent": [
         {
             "type": "grab taxi",

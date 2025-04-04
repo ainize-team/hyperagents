@@ -6,6 +6,9 @@ import {
 import { IndexFlatL2 } from "faiss-node";
 import path from "path";
 import fs from "fs";
+import { Memory } from "../memory";
+import InMemoryMemory from "../memory/InMemoryMemory";
+import { MemoryType } from "../type";
 
 interface Intent {
   type: string;
@@ -13,18 +16,22 @@ interface Intent {
 }
 
 class IntentManagerAgent {
+  private name: string;
   private embeddingApiKey?: string;
   private embeddingEndpoint?: string;
   private embeddingApiVersion?: string;
   private embeddingDeploymentName: string = "text-embedding-002-ada";
   private embeddingClient: AzureOpenAI;
-  private intents: Intent[] = [];
+  private intentCandidates: Intent[] = [];
   private intentIndex?: IndexFlatL2;
   private intentEmbeddings: number[][] = [];
   private intentTypes: string[] = [];
   private indexFilePath?: string;
-
+  private memory: Memory;
+  private memoryType: MemoryType;
+  private validIntents: string[] = [];
   constructor(config: IntentManagerConfig) {
+    this.name = config.name;
     this.embeddingApiKey = config.embeddingApiKey;
     this.embeddingEndpoint = config.embeddingEndpoint;
     this.embeddingApiVersion = config.embeddingApiVersion;
@@ -35,8 +42,19 @@ class IntentManagerAgent {
 
     // 설정에서 의도 정보 로드
     if (config.intent && Array.isArray(config.intent)) {
-      this.intents = config.intent;
-      this.initializeIntentIndex();
+      this.intentCandidates = config.intent;
+    }
+
+    this.memoryType = config.memoryType || MemoryType.inMemory;
+
+    if (this.memoryType === MemoryType.inMemory) {
+      this.memory = InMemoryMemory.getInstance();
+    } else {
+      throw new Error("Memory type not supported");
+    }
+
+    if (config.validIntents && Array.isArray(config.validIntents)) {
+      this.validIntents = config.validIntents;
     }
   }
 
@@ -61,9 +79,12 @@ class IntentManagerAgent {
     // 인덱스 파일 경로 설정
     agent.indexFilePath = indexFilePath;
 
-    // 인덱스 파일이 존재하면 로드
+    // 인덱스 파일이 존재하면 로드하고, 존재하지 않으면 초기화
     if (fs.existsSync(indexFilePath)) {
       agent.loadIntentIndex();
+    } else {
+      // 파일이 없을 때만 인덱스 초기화 수행
+      agent.initializeIntentIndex();
     }
 
     return agent;
@@ -87,20 +108,18 @@ class IntentManagerAgent {
   }
 
   private async initializeIntentIndex(): Promise<void> {
-    if (this.intents.length === 0) return;
+    if (this.intentCandidates.length === 0) return;
 
-    // 인덱스 파일이 존재하고 이미 로드되었으면 초기화 건너뛰기
-    if (
-      this.indexFilePath &&
-      fs.existsSync(this.indexFilePath) &&
-      this.intentIndex
-    ) {
-      console.log(`Using existing intent index from ${this.indexFilePath}`);
+    // 인덱스가 이미 초기화되었으면 건너뛰기
+    if (this.intentIndex) {
+      console.log("Intent index already initialized");
       return;
     }
 
+    console.log("Initializing intent index...");
+
     // 모든 의도 예제에 대한 임베딩 생성
-    for (const intent of this.intents) {
+    for (const intent of this.intentCandidates) {
       for (const example of intent.example) {
         const embedding = await this.getEmbedding(example);
         this.intentEmbeddings.push(embedding);
@@ -198,6 +217,8 @@ class IntentManagerAgent {
       throw new Error("Intent index not initialized");
     }
 
+    console.log("Searching intent for text: ", text);
+
     // 입력 텍스트의 임베딩 생성
     const queryEmbedding = await this.getEmbedding(text);
 
@@ -205,20 +226,39 @@ class IntentManagerAgent {
     const k = 3; // 상위 3개 결과 검색
     const searchResult = this.intentIndex.search(queryEmbedding, k);
 
+    // 가장 유사한 의도가 거리 0.5 이상이면 None 반환
+    if (searchResult.distances[0] >= 0.5) {
+      return "None";
+    }
+
     // 가장 유사한 의도 반환
     const topMatchIndex = searchResult.labels[0] as unknown as number;
-    console.log(topMatchIndex);
     return this.intentTypes[topMatchIndex];
   }
 
   public async run(input: string): Promise<string> {
+    const messages = await this.memory.loadMap();
+    const processedInput = input.replace(/\^(.*?)\^/g, (_, memoryId) => {
+      const memoryData = messages.get(memoryId);
+      return memoryData?.content || memoryId;
+    });
+
     try {
-      const intent = await this.classifyIntent(input);
-      return `Intent: ${intent}`;
+      const intent = await this.classifyIntent(processedInput);
+      console.log("Intent: ", intent);
+      return intent;
     } catch (error) {
       console.error("Error classifying intent:", error);
       return "Failed to classify intent";
     }
+  }
+
+  public getName(): string {
+    return this.name;
+  }
+
+  public getValidIntents(): string[] {
+    return this.validIntents;
   }
 }
 

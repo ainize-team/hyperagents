@@ -58,6 +58,7 @@ class Graph {
 
   getNode(name: string): Agent | IntentManagerAgent {
     const agent = this.node.get(name);
+    console.log("agent: ", agent);
     if (!agent) {
       throw new Error(`Agent ${name} not found`);
     }

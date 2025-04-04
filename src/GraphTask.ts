@@ -1,3 +1,5 @@
+import Agent from "./agent/Agent";
+import IntentManagerAgent from "./agent/IntentManagerAgent";
 import Graph from "./Graph";
 import { Memory } from "./memory";
 
@@ -182,15 +184,32 @@ class GraphTask {
     let queue = this.graph.getEntryPoint();
     while (true) {
       const edge = queue.shift();
+
       if (!edge) {
         const messages = await this.memory.load();
         return messages[messages.length - 1].content;
       }
       const agent = this.graph.getNode(edge.to);
-      await agent.run(edge.prompt, edge.memoryId, edge.functions);
+      const agentRunOutput = await agent.run(
+        edge.prompt,
+        edge.memoryId,
+        edge.functions
+      );
 
       const edges = this.graph.getEdges(edge.to);
-      edges.forEach((e) => queue.push(e));
+
+      if (agent instanceof IntentManagerAgent) {
+        edges.forEach((e) => {
+          const agent = this.graph.getNode(e.to);
+          if (agent.getValidIntents().includes(agentRunOutput)) {
+            queue.push(e);
+          }
+        });
+      } else {
+        edges.forEach((e) => {
+          queue.push(e);
+        });
+      }
     }
   }
 }
