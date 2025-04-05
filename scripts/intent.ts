@@ -21,18 +21,15 @@ async function main() {
   );
 
   const foodie = await Agent.fromConfigFile("Foodie.json", {
-    llmEndpoint: process.env.OPENAI_BASE_URL!,
-    llmApiKey: process.env.OPENAI_API_KEY!,
+    llmApiKey: process.env.GOOGLE_API_KEY!,
   });
 
   const artie = await Agent.fromConfigFile("Artie.json", {
-    llmEndpoint: process.env.OPENAI_BASE_URL!,
-    llmApiKey: process.env.OPENAI_API_KEY!,
+    llmApiKey: process.env.GOOGLE_API_KEY!,
   });
 
   const actors = await Agent.fromConfigFile("Actors.json", {
-    llmEndpoint: process.env.OPENAI_BASE_URL!,
-    llmApiKey: process.env.OPENAI_API_KEY!,
+    llmApiKey: process.env.GOOGLE_API_KEY!,
   });
 
   const muzie = await Agent.fromConfigFile("Muzie.json", {
@@ -70,6 +67,7 @@ async function main() {
     prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
     intent: ["general_recommandation"],
+    memoryId: "foodie-general_recommendation",
   });
 
   graph.addEdge({
@@ -77,6 +75,7 @@ async function main() {
     to: "artie",
     prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
+    memoryId: "artie-general_recommendation",
   });
 
   graph.addEdge({
@@ -84,6 +83,7 @@ async function main() {
     to: "actors",
     prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
+    memoryId: "actors-general_recommendation",
   });
 
   graph.addEdge({
@@ -91,6 +91,7 @@ async function main() {
     to: "muzie",
     prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
+    memoryId: "muzie-general_recommendation",
   });
 
   graph.addEdge({
@@ -98,13 +99,31 @@ async function main() {
     to: "welly",
     prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
+    memoryId: "welly-general_recommendation",
   });
 
   graph.addEdge({
     from: "welly",
     to: "master",
     prompt: `Provide the summary of the agents's conversation:
+    <Foodie>
+      ^foodie-general_recommendation^
+    </Foodie>
+    <Artie>
+      ^artie-general_recommendation^
+    </Artie>
+    <Actors>
+      ^actors-general_recommendation^
+    </Actors>
+    <Muzie>
+      ^muzie-general_recommendation^
+    </Muzie>
+    <Welly>
+      ^welly-general_recommendation^
+    </Welly>
+    
       User Question: ^USER_INPUT^`,
+    memoryId: "master-summary",
   });
 
   graph.addEdge({
@@ -116,21 +135,23 @@ async function main() {
 
       User Question: ^USER_INPUT^`,
     intent: ["food_recommendation"],
+    memoryId: "foodie-food_recommendation",
   });
 
   const task = new GraphTask(graph, InMemoryMemory.getInstance());
-  task
-    .runTask("배고파") // "체크인 하기 전에 밥 먹으려고 하는데 워커힐 호텔 근처에 가볼만한 곳 추천해줘"
-    .then((result) => {
-      return task.exportMemory();
-    })
-    .then((result) => {
-      fs.writeFileSync("conversation.html", result);
-      console.log("Conversation has been saved to conversation.html file.");
-    })
-    .catch((error) => {
-      console.error("Error occurred:", error);
-    });
+  for await (const result of task.runTask(
+    "I don't know what to do in Gangnam Station"
+  )) {
+    console.log("--------- AGENT INFO ---------");
+    console.log("agent: ", result.agent);
+    console.log("\n--------- AGENT OUTPUT ---------");
+    console.log("agentRunOutput: ", result.output);
+  }
+
+  await task.exportMemory().then((result) => {
+    fs.writeFileSync("conversation.html", result);
+    console.log("Conversation has been saved to conversation.html file.");
+  });
 }
 
 main();

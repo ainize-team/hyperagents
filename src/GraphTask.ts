@@ -174,7 +174,7 @@ class GraphTask {
     return html;
   }
 
-  async runTask(input: string) {
+  async *runTask(input: string) {
     this.memory.add({
       id: "USER_INPUT",
       author: "user",
@@ -197,10 +197,8 @@ class GraphTask {
         edge.functions
       );
 
-      console.log("\n--------- AGENT INFO ---------");
-      console.log("agent: ", agent?.getName());
-      console.log("\n--------- AGENT OUTPUT ---------");
-      console.log("agentRunOutput: ", agentRunOutput);
+      // yield the agent name and output
+      yield { agent: agent?.getName(), output: agentRunOutput };
 
       const edges = this.graph.getEdges(edge.to);
 

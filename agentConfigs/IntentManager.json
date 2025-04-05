@@ -12,7 +12,8 @@
                 "What are some interesting activities I can do in this area?",
                 "Can you suggest some quick activities to fill my free time?",
                 "I'm looking for something to do right now, any recommendations?",
-                "What are popular attractions near me that I can visit?"
+                "What are popular attractions near me that I can visit?",
+                "I don't know what to do in Gangnam Station"
             ]
         },
         {
@@ -22,7 +23,9 @@
                 "where should I go for a weekend trip?",
                 "Can you recommend some good places to visit in Seoul?",
                 "What are must-visit attractions in Seong-su?",
-                "I'm planning a trip to Gangnam Station, what should I see?"
+                "I'm planning a trip to Gangnam Station, what should I see?",
+                "I hate Korean food, what should I eat?",
+                "Which restaurant is good in Gaepo-dong?"
             ]
         },
         {

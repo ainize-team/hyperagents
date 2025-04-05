@@ -12,17 +12,17 @@ import { extractArray, extractString } from "../tools/stringExtractor";
 import { ClaudeLLMClient } from "../llm/ClaudeLLMClient";
 
 class Agent {
-  private name: string;
-  private systemPrompt: string;
-  private llm: LLMType;
-  private publicDesc: string;
-  private llmEndpoint?: string;
-  private llmApiKey?: string;
-  private memoryType: MemoryType;
-  private privateKey?: Map<PrivateKeyType, string>;
-  private walletDataStr?: string;
-  private memory: Memory;
-  private llmClient: ILLMClient;
+  protected name: string;
+  protected systemPrompt: string;
+  protected llm: LLMType;
+  protected publicDesc: string;
+  protected llmEndpoint?: string;
+  protected llmApiKey?: string;
+  protected memoryType: MemoryType;
+  protected privateKey?: Map<PrivateKeyType, string>;
+  protected walletDataStr?: string;
+  protected memory: Memory;
+  protected llmClient: ILLMClient;
 
   constructor(config: AgentConfigs) {
     this.name = config.name;
@@ -45,7 +45,7 @@ class Agent {
 
   static async fromConfigFile(
     configPath: string,
-    overrides?: Partial<AgentConfigs>,
+    overrides?: Partial<AgentConfigs>
   ): Promise<Agent> {
     const config = await loadAgentConfig(configPath);
     const mergedConfig = {
@@ -163,7 +163,7 @@ class Agent {
         const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
         const truncatedKey = ethPrivateKey?.slice(0, 6) + "...";
         console.log(
-          `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`,
+          `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`
         );
       }
     } catch (error) {
@@ -213,8 +213,14 @@ class Agent {
       const contributors = extractArray(output, "contributors");
       const allocatedAmounts = extractArray(output, "allocatedAmounts");
 
-      await (contract as any).createTrustGameByJobOwner(proposalId, contributors, allocatedAmounts);
-      console.log(`**agent ${this.name} created trust game for proposal:${proposalId}`);
+      await (contract as any).createTrustGameByJobOwner(
+        proposalId,
+        contributors,
+        allocatedAmounts
+      );
+      console.log(
+        `**agent ${this.name} created trust game for proposal:${proposalId}`
+      );
     } catch (error) {
       console.error(`**agent ${this.name} failed to create trust game:`, error);
     }
@@ -233,7 +239,7 @@ class Agent {
 
       await (contract as any).paybackedByContributor(proposalId, paybackAmount);
       console.log(
-        `**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`,
+        `**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`
       );
     } catch (error) {
       console.error(`**agent ${this.name} failed to sign payback:`, error);
