@@ -20,40 +20,30 @@ const foodie = Agent.fromConfigFile("Foodie.json", {
   llmApiKey: process.env.OPENAI_API_KEY!,
 });
 
-const artie = Agent.fromConfigFile("Artie.json", {
-  llmEndpoint: process.env.OPENAI_BASE_URL!,
-  llmApiKey: process.env.OPENAI_API_KEY!,
-});
-
 const graph = new Graph();
 
 graph.addAgentNode({ agent: intentManager, nodeId: "intent_manager" });
 graph.addAgentNode({
   agent: foodie,
-  nodeId: "foodie taxi",
-});
-graph.addAgentNode({
-  agent: artie,
-  nodeId: "artie travel",
+  nodeId: "foodie",
 });
 
-graph.setEntryPoint("intent_manager", `^USER_INPUT^`, "intent_manager");
+graph.setEntryPoint("intent_manager", `^USER_INPUT^`, "foodie");
 
 graph.addEdge({
   from: "intent_manager",
-  to: "foodie taxi",
-  prompt: `^USER_INPUT^`,
-});
-
-graph.addEdge({
-  from: "intent_manager",
-  to: "artie travel",
-  prompt: `^USER_INPUT^`,
+  to: "foodie",
+  prompt: `Answer the user's question based on the following information:
+    - Recommend 3 places to visit
+    - End the sentence with a polite tone
+    User Question: ^USER_INPUT^`,
 });
 
 const task = new GraphTask(graph, InMemoryMemory.getInstance());
 task
-  .runTask("Can you recommend some good places to visit in Seoul?") // I want to hail a taxi
+  .runTask(
+    "체크인 하기 전에 밥 먹으려고 하는데 워커힐 호텔 근처에 가볼만한 곳 추천해줘"
+  ) // I want to hail a taxi
   .then((result) => {
     return task.exportMemory();
   })
