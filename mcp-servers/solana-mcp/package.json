@@ -1,0 +1,22 @@
+{
+    "type": "module",
+    "bin": {
+        "weather": "./build/index.js"
+    },
+    "scripts": {
+        "build": "tsc && chmod 755 build/index.js"
+    },
+    "files": [
+        "build"
+    ],
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.8.0",
+        "@solana/web3.js": "^1.98.0",
+        "solana-agent-kit": "^1.4.9",
+        "zod": "^3.24.2"
+    },
+    "devDependencies": {
+        "@types/node": "^22.14.0",
+        "typescript": "^5.8.2"
+    }
+}
