@@ -1,10 +1,5 @@
-import {
-  getEnumKeyByValue,
-  LLMType,
-  MemoryType,
-  PrivateKeyType,
-} from "../type";
-import fs from "fs";
+import { getEnumKeyByValue, LLMType, MemoryType, PrivateKeyType } from "../type";
+import fs from "fs/promises";
 import path from "path";
 
 export interface AgentConfigs {
@@ -33,10 +28,10 @@ export function isAgentConfigs(obj: unknown): obj is AgentConfigs {
   );
 }
 
-export function loadAgentConfig(fileName: string): AgentConfigs {
+export async function loadAgentConfig(fileName: string): Promise<AgentConfigs> {
   const filePath = path.join(__dirname, "../../agentConfigs", fileName);
   try {
-    const rawData = fs.readFileSync(filePath, "utf8");
+    const rawData = await fs.readFile(filePath, "utf8");
     const config = JSON.parse(rawData);
 
     if (config.memoryType) {

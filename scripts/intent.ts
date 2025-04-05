@@ -15,12 +15,12 @@ const intentManager = IntentManagerAgent.fromConfigFile("IntentManager.json", {
   embeddingDeploymentName: process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME!,
 });
 
-const foodie = Agent.fromConfigFile("Foodie.json", {
+const foodie = await Agent.fromConfigFile("Foodie.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 });
 
-const artie = Agent.fromConfigFile("Artie.json", {
+const artie = await Agent.fromConfigFile("Artie.json", {
   llmEndpoint: process.env.OPENAI_BASE_URL!,
   llmApiKey: process.env.OPENAI_API_KEY!,
 });

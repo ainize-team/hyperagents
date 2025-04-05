@@ -9,20 +9,21 @@ import { OraLLMClient } from "../llm/OraLLMClient";
 import { runCoinbaseAgentkitWithAzureOpenAI } from "../tools/coinbaseAgentkit";
 import { getDHAOContract } from "../tools/contract.Signer";
 import { extractArray, extractString } from "../tools/stringExtractor";
+import { ClaudeLLMClient } from "../llm/ClaudeLLMClient";
 
 class Agent {
-  private name: string;
-  private systemPrompt: string;
-  private llm: LLMType;
-  private publicDesc: string;
-  private validIntents: string[];
-  private llmEndpoint?: string;
-  private llmApiKey?: string;
-  private memoryType: MemoryType;
-  private privateKey?: Map<PrivateKeyType, string>;
-  private walletDataStr?: string;
-  private memory: Memory;
-  private llmClient: ILLMClient;
+  protected name: string;
+  protected systemPrompt: string;
+  protected llm: LLMType;
+  protected publicDesc: string;
+  protected validIntents: string[];
+  protected llmEndpoint?: string;
+  protected llmApiKey?: string;
+  protected memoryType: MemoryType;
+  protected privateKey?: Map<PrivateKeyType, string>;
+  protected walletDataStr?: string;
+  protected memory: Memory;
+  protected llmClient: ILLMClient;
 
   constructor(config: AgentConfigs) {
     this.name = config.name;
@@ -44,11 +45,11 @@ class Agent {
     this.llmClient = this.createLLMClient();
   }
 
-  static fromConfigFile(
+  static async fromConfigFile(
     configPath: string,
-    overrides?: Partial<AgentConfigs>
-  ): Agent {
-    const config = loadAgentConfig(configPath);
+    overrides?: Partial<AgentConfigs>,
+  ): Promise<Agent> {
+    const config = await loadAgentConfig(configPath);
     return new Agent({
       ...config,
       ...overrides,
@@ -75,11 +76,7 @@ class Agent {
     return this.validIntents;
   }
 
-  public async run(
-    input: string,
-    resultMemoryId?: string,
-    functions?: string[]
-  ): Promise<string> {
+  public async run(input: string, resultMemoryId?: string, functions?: string[]): Promise<string> {
     const messages = await this.memory.loadMap();
     const processedInput = input.replace(/\^(.*?)\^/g, (_, memoryId) => {
       const memoryData = messages.get(memoryId);
@@ -110,6 +107,12 @@ class Agent {
 
   private createLLMClient(): ILLMClient {
     switch (this.llm) {
+      case LLMType.CLAUDE_3_5_SONNET:
+        if (!this.llmApiKey) {
+          throw new Error("API key is required for Claude LLM");
+        }
+        return new ClaudeLLMClient(this.llmApiKey, this.llm);
+
       case LLMType.GEMINI_1_5_FLASH:
         if (!this.llmApiKey) {
           throw new Error("API key is required for Google LLM");
@@ -133,11 +136,11 @@ class Agent {
     }
   }
 
-  private async executeLLM(input: string): Promise<string> {
+  protected async executeLLM(input: string): Promise<string> {
     return await this.llmClient.generateContent(this.systemPrompt, input);
   }
 
-  private functionHandle(functions: string[], output: string): void {
+  protected functionHandle(functions: string[], output: string): void {
     for (const functionName of functions) {
       if (functionName === "vote") {
         this.vote(output);
@@ -166,7 +169,7 @@ class Agent {
         const ethPrivateKey = this.privateKey.get(PrivateKeyType.ETH);
         const truncatedKey = ethPrivateKey?.slice(0, 6) + "...";
         console.log(
-          `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`
+          `**agent ${this.name} voted proposal:${proposalId} with ethPrivateKey:${truncatedKey}`,
         );
       }
     } catch (error) {
@@ -216,14 +219,8 @@ class Agent {
       const contributors = extractArray(output, "contributors");
       const allocatedAmounts = extractArray(output, "allocatedAmounts");
 
-      await (contract as any).createTrustGameByJobOwner(
-        proposalId,
-        contributors,
-        allocatedAmounts
-      );
-      console.log(
-        `**agent ${this.name} created trust game for proposal:${proposalId}`
-      );
+      await (contract as any).createTrustGameByJobOwner(proposalId, contributors, allocatedAmounts);
+      console.log(`**agent ${this.name} created trust game for proposal:${proposalId}`);
     } catch (error) {
       console.error(`**agent ${this.name} failed to create trust game:`, error);
     }
@@ -242,7 +239,7 @@ class Agent {
 
       await (contract as any).paybackedByContributor(proposalId, paybackAmount);
       console.log(
-        `**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`
+        `**agent ${this.name} would sign payback:${paybackAmount} for proposal:${proposalId}`,
       );
     } catch (error) {
       console.error(`**agent ${this.name} failed to sign payback:`, error);
