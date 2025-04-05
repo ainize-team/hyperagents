@@ -147,6 +147,11 @@ async function main() {
     console.log("\n--------- AGENT OUTPUT ---------");
     console.log("agentRunOutput: ", result.output);
   }
+
+  await task.exportMemory().then((result) => {
+    fs.writeFileSync("conversation.html", result);
+    console.log("Conversation has been saved to conversation.html file.");
+  });
 }
 
 main();
