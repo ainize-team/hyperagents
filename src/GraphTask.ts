@@ -206,7 +206,7 @@ class GraphTask {
 
       if (agent instanceof IntentManagerAgent) {
         edges.forEach((e) => {
-          if (e.intent === agentRunOutput) {
+          if (e.intent?.includes(agentRunOutput)) {
             queue.push(e);
           }
         });
