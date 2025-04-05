@@ -190,11 +190,17 @@ class GraphTask {
         return messages[messages.length - 1].content;
       }
       const agent = this.graph.getNode(edge.to);
+
       const agentRunOutput = await agent.run(
         edge.prompt,
         edge.memoryId,
         edge.functions
       );
+
+      console.log("\n--------- AGENT INFO ---------");
+      console.log("agent: ", agent?.getName());
+      console.log("\n--------- AGENT OUTPUT ---------");
+      console.log("agentRunOutput: ", agentRunOutput);
 
       const edges = this.graph.getEdges(edge.to);
 

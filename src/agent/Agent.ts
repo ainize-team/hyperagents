@@ -44,15 +44,17 @@ class Agent {
     this.llmClient = this.createLLMClient();
   }
 
-  static fromConfigFile(
+  static async fromConfigFile(
     configPath: string,
     overrides?: Partial<AgentConfigs>
-  ): Agent {
-    const config = loadAgentConfig(configPath);
-    return new Agent({
+  ): Promise<Agent> {
+    const config = await loadAgentConfig(configPath);
+    const mergedConfig = {
       ...config,
       ...overrides,
-    });
+    };
+
+    return new Agent(mergedConfig as AgentConfigs);
   }
 
   public getName(): string {
@@ -86,14 +88,8 @@ class Agent {
       return memoryData?.content || memoryId;
     });
 
-    // Simple separator for better readability
-    console.log("\n--------- AGENT INFO ---------");
-    console.log("### Agent: ", this.name);
-    // console.log("processedInput: ", processedInput);
-
     const output = await this.executeLLM(processedInput);
-    console.log("\n--------- AGENT OUTPUT ---------");
-    console.log(output);
+
     if (functions) {
       this.functionHandle(functions, output);
     }
