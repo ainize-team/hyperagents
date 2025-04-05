@@ -12,6 +12,7 @@ export interface AgentConfigs {
   systemPrompt: string;
   llm: LLMType;
   publicDesc: string;
+  validIntents?: string[];
   llmApiKey?: string;
   llmEndpoint?: string;
   memoryType: MemoryType;
@@ -27,7 +28,8 @@ export function isAgentConfigs(obj: unknown): obj is AgentConfigs {
     "systemPrompt" in obj &&
     "llm" in obj &&
     "publicDesc" in obj &&
-    "memoryType" in obj
+    "memoryType" in obj &&
+    "validIntents" in obj
   );
 }
 

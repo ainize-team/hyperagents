@@ -1,0 +1,27 @@
+{
+    "name": "IntentManager",
+    "systemPrompt": "You are a manager of intent. You are responsible for managing the intent of the user.",
+    "llm": "gpt-4o",
+    "publicDesc": "IntentManager",
+    "memoryType": "InMemory",
+    "validIntents": ["need routing"],
+    "intent": [
+        {
+            "type": "grab taxi",
+            "example": [
+                "I want to grab a taxi",
+                "I want to go to Walkerhill Hotel from Incheon Airport"
+            ]
+        },
+        {
+            "type": "looking for travel advice",
+            "example": [
+                "I want to know the best travel destination in Korea",
+                "where should I go for a weekend trip?",
+                "Can you recommend some good places to visit in Seoul?",
+                "What are must-visit attractions in Seong-su?",
+                "I'm planning a trip to Gangnam Station, what should I see?"
+            ]
+        }
+    ]
+}
