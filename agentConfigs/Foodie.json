@@ -4,5 +4,5 @@
   "llm": "gpt-4o",
   "publicDesc": "foodie - your personal curator for flavorful, fun, and unforgettable food experiences",
   "memoryType": "InMemory",
-  "validIntents": ["food_recommandation"]
+  "validIntents": ["general_recommandation", "food_recommandation"]
 }

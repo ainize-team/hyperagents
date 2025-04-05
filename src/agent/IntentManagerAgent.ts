@@ -58,10 +58,10 @@ class IntentManagerAgent {
     }
   }
 
-  static fromConfigFile(
+  static async fromConfigFile(
     configPath: string,
     overrides?: Partial<IntentManagerConfig>
-  ): IntentManagerAgent {
+  ): Promise<IntentManagerAgent> {
     const config = loadIntentManagerConfig(configPath);
 
     // 인덱스 파일 경로 설정 (configPath에서 파일 이름만 추출하여 사용)
@@ -84,7 +84,7 @@ class IntentManagerAgent {
       agent.loadIntentIndex();
     } else {
       // 파일이 없을 때만 인덱스 초기화 수행
-      agent.initializeIntentIndex();
+      await agent.initializeIntentIndex();
     }
 
     return agent;
@@ -146,7 +146,7 @@ class IntentManagerAgent {
     }
   }
 
-  private loadIntentIndex(): void {
+  private async loadIntentIndex(): Promise<void> {
     if (!this.indexFilePath || !fs.existsSync(this.indexFilePath)) {
       console.warn("Index file does not exist, cannot load index");
       return;

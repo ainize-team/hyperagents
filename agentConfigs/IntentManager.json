@@ -7,6 +7,16 @@
     "validIntents": ["need routing"],
     "intent": [
         {
+            "type": "general_recommandation",
+            "example": [
+                "I have about 3 hours before check-in, can you recommend something to do nearby?",
+                "What are some interesting activities I can do in this area?",
+                "Can you suggest some quick activities to fill my free time?",
+                "I'm looking for something to do right now, any recommendations?",
+                "What are popular attractions near me that I can visit?"
+            ]
+        },
+        {
             "type": "food_recommandation",
             "example": [
                 "I want to know the best food in Korea",
