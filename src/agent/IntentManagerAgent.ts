@@ -58,10 +58,10 @@ class IntentManagerAgent {
     }
   }
 
-  static fromConfigFile(
+  static async fromConfigFile(
     configPath: string,
     overrides?: Partial<IntentManagerConfig>
-  ): IntentManagerAgent {
+  ): Promise<IntentManagerAgent> {
     const config = loadIntentManagerConfig(configPath);
 
     // 인덱스 파일 경로 설정 (configPath에서 파일 이름만 추출하여 사용)
@@ -77,14 +77,14 @@ class IntentManagerAgent {
     });
 
     // 인덱스 파일 경로 설정
-    agent.indexFilePath = indexFilePath;
+    agent.setIndexFilePath(indexFilePath);
 
     // 인덱스 파일이 존재하면 로드하고, 존재하지 않으면 초기화
     if (fs.existsSync(indexFilePath)) {
       agent.loadIntentIndex();
     } else {
       // 파일이 없을 때만 인덱스 초기화 수행
-      agent.initializeIntentIndex();
+      await agent.initializeIntentIndex();
     }
 
     return agent;
@@ -116,8 +116,6 @@ class IntentManagerAgent {
       return;
     }
 
-    console.log("Initializing intent index...");
-
     // 모든 의도 예제에 대한 임베딩 생성
     for (const intent of this.intentCandidates) {
       for (const example of intent.example) {
@@ -130,6 +128,8 @@ class IntentManagerAgent {
     // Faiss 인덱스 초기화 (임베딩 차원: 1536)
     const dimension = 1536;
     this.intentIndex = new IndexFlatL2(dimension);
+
+    console.log("intentIndex: ", this.intentIndex);
 
     // 인덱스에 임베딩 추가
     for (const embedding of this.intentEmbeddings) {
@@ -146,7 +146,7 @@ class IntentManagerAgent {
     }
   }
 
-  private loadIntentIndex(): void {
+  private async loadIntentIndex(): Promise<void> {
     if (!this.indexFilePath || !fs.existsSync(this.indexFilePath)) {
       console.warn("Index file does not exist, cannot load index");
       return;
@@ -259,6 +259,10 @@ class IntentManagerAgent {
 
   public getValidIntents(): string[] {
     return this.validIntents;
+  }
+
+  public setIndexFilePath(indexFilePath: string): void {
+    this.indexFilePath = indexFilePath;
   }
 }
 

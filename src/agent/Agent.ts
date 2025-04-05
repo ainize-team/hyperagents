@@ -50,10 +50,12 @@ class Agent {
     overrides?: Partial<AgentConfigs>,
   ): Promise<Agent> {
     const config = await loadAgentConfig(configPath);
-    return new Agent({
+    const mergedConfig = {
       ...config,
       ...overrides,
-    });
+    };
+
+    return new Agent(mergedConfig as AgentConfigs);
   }
 
   public getName(): string {
@@ -83,14 +85,8 @@ class Agent {
       return memoryData?.content || memoryId;
     });
 
-    // Simple separator for better readability
-    console.log("\n--------- AGENT INFO ---------");
-    console.log("### Agent: ", this.name);
-    // console.log("processedInput: ", processedInput);
-
     const output = await this.executeLLM(processedInput);
-    console.log("\n--------- AGENT OUTPUT ---------");
-    console.log(output);
+
     if (functions) {
       this.functionHandle(functions, output);
     }
