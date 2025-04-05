@@ -25,13 +25,34 @@ async function main() {
     llmApiKey: process.env.OPENAI_API_KEY!,
   });
 
+  const artie = await Agent.fromConfigFile("Artie.json", {
+    llmEndpoint: process.env.OPENAI_BASE_URL!,
+    llmApiKey: process.env.OPENAI_API_KEY!,
+  });
+
+  const actors = await Agent.fromConfigFile("Actors.json", {
+    llmEndpoint: process.env.OPENAI_BASE_URL!,
+    llmApiKey: process.env.OPENAI_API_KEY!,
+  });
+
+  const muzie = await Agent.fromConfigFile("Muzie.json", {
+    llmEndpoint: process.env.OPENAI_BASE_URL!,
+    llmApiKey: process.env.OPENAI_API_KEY!,
+  });
+
+  const welly = await Agent.fromConfigFile("Welly.json", {
+    llmEndpoint: process.env.OPENAI_BASE_URL!,
+    llmApiKey: process.env.OPENAI_API_KEY!,
+  });
+
   const graph = new Graph();
 
-  await graph.addAgentNode({ agent: intentManager, nodeId: "intent_manager" });
-  await graph.addAgentNode({
-    agent: foodie,
-    nodeId: "foodie",
-  });
+  graph.addAgentNode({ agent: intentManager, nodeId: "intent_manager" });
+  graph.addAgentNode({ agent: foodie, nodeId: "foodie" });
+  graph.addAgentNode({ agent: artie, nodeId: "artie" });
+  graph.addAgentNode({ agent: actors, nodeId: "actors" });
+  graph.addAgentNode({ agent: muzie, nodeId: "muzie" });
+  graph.addAgentNode({ agent: welly, nodeId: "welly" });
 
   graph.setEntryPoint("intent_manager", `^USER_INPUT^`, "foodie");
 
@@ -39,8 +60,34 @@ async function main() {
     from: "intent_manager",
     to: "foodie",
     prompt: `Answer the user's question based on the following information:
-      - Recommend 3 places to visit
-      - End the sentence with a polite tone
+      User Question: ^USER_INPUT^`,
+  });
+
+  graph.addEdge({
+    from: "intent_manager",
+    to: "artie",
+    prompt: `Answer the user's question based on the following information:
+      User Question: ^USER_INPUT^`,
+  });
+
+  graph.addEdge({
+    from: "intent_manager",
+    to: "actors",
+    prompt: `Answer the user's question based on the following information:
+      User Question: ^USER_INPUT^`,
+  });
+
+  graph.addEdge({
+    from: "intent_manager",
+    to: "muzie",
+    prompt: `Answer the user's question based on the following information:
+      User Question: ^USER_INPUT^`,
+  });
+
+  graph.addEdge({
+    from: "intent_manager",
+    to: "welly",
+    prompt: `Answer the user's question based on the following information:
       User Question: ^USER_INPUT^`,
   });
 

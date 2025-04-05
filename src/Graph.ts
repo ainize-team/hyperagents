@@ -41,7 +41,7 @@ class Graph {
     });
   }
 
-  async addAgentNode(nodeconfig: {
+  addAgentNode(nodeconfig: {
     agent: Agent | IntentManagerAgent;
     nodeId: string;
   }) {
