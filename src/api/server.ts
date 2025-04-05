@@ -1,13 +1,24 @@
+import express, { Request, Response } from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import Graph from "../src/Graph";
-import InMemoryMemory from "../src/memory/InMemoryMemory";
-import GraphTask from "../src/GraphTask";
-import fs from "fs";
-import IntentManagerAgent from "../src/agent/IntentManagerAgent";
-import Agent from "../src/agent/Agent";
+import Graph from "../Graph";
+import InMemoryMemory from "../memory/InMemoryMemory";
+import GraphTask from "../GraphTask";
+import IntentManagerAgent from "../agent/IntentManagerAgent";
+import Agent from "../agent/Agent";
+
 dotenv.config();
 
-async function main() {
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 미들웨어 설정
+app.use(cors());
+app.use(bodyParser.json());
+
+// 그래프 생성 함수
+async function createGraph() {
   // 1. intent manager
   const intentManager = await IntentManagerAgent.fromConfigFile(
     "IntentManager.json",
@@ -138,15 +149,53 @@ async function main() {
     memoryId: "foodie-food_recommendation",
   });
 
-  const task = new GraphTask(graph, InMemoryMemory.getInstance());
-  for await (const result of task.runTask(
-    "I don't know what to do in Gangnam Station"
-  )) {
-    console.log("--------- AGENT INFO ---------");
-    console.log("agent: ", result.agent);
-    console.log("\n--------- AGENT OUTPUT ---------");
-    console.log("agentRunOutput: ", result.output);
-  }
+  return graph;
 }
 
-main();
+// API 엔드포인트 설정
+app.post("/api/intent", async (req: Request, res: Response) => {
+  try {
+    const { userInput } = req.body as { userInput: string };
+
+    if (!userInput) {
+      res.status(400).json({ error: "사용자 입력이 필요합니다" });
+      return;
+    }
+
+    const graph = await createGraph();
+    const task = new GraphTask(graph, InMemoryMemory.getInstance());
+
+    // SSE 스트리밍을 위한 헤더 설정
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+    res.flushHeaders(); // 헤더 즉시 전송
+
+    // 각 결과를 스트리밍으로 클라이언트에 전송
+    for await (const result of task.runTask(userInput)) {
+      // 각 메시지를 SSE 형식(data: {내용}\n\n)으로 전송합니다.
+      res.write(`data: ${JSON.stringify(result)}\n\n`);
+    }
+
+    // 스트리밍 완료 후 종료 메시지 전송
+    res.write(`data: [DONE]\n\n`);
+    res.end();
+  } catch (error) {
+    console.error("Error processing intent:", error);
+    // 스트리밍 중 에러가 발생할 경우, 에러를 클라이언트에 전달할 수도 있습니다.
+    res.status(500).json({
+      success: false,
+      error: "서버 오류가 발생했습니다",
+      message: error instanceof Error ? error.message : "알 수 없는 오류",
+    });
+  }
+});
+
+// 서버 시작
+app.listen(PORT, () => {
+  console.log(`서버가 포트 ${PORT}에서 실행 중입니다`);
+});
+
+export default app;
