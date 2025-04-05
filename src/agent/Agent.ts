@@ -15,7 +15,6 @@ class Agent {
   private systemPrompt: string;
   private llm: LLMType;
   private publicDesc: string;
-  private validIntents: string[];
   private llmEndpoint?: string;
   private llmApiKey?: string;
   private memoryType: MemoryType;
@@ -29,7 +28,6 @@ class Agent {
     this.systemPrompt = config.systemPrompt;
     this.llm = config.llm;
     this.publicDesc = config.publicDesc;
-    this.validIntents = config.validIntents ?? [];
     this.llmEndpoint = config.llmEndpoint;
     this.llmApiKey = config.llmApiKey;
     this.memoryType = config.memoryType;
@@ -71,10 +69,6 @@ class Agent {
 
   public getPublicDesc(): string {
     return this.publicDesc;
-  }
-
-  public getValidIntents(): string[] {
-    return this.validIntents;
   }
 
   public async run(

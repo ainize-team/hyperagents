@@ -10,8 +10,6 @@ interface Intent {
 
 export interface IntentManagerConfig {
   name: string;
-  validIntents: string[];
-
   embeddingApiKey?: string;
   embeddingEndpoint?: string;
   embeddingApiVersion?: string;
