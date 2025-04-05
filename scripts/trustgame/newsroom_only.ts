@@ -75,7 +75,7 @@ graph.addEdge({
 - Engaging Approach: Incorporate trendy expressions and reflect community culture.  
 
 ### Article Structure:
-- Title: Ensure it aligns with the <Editor’s Instructions>, making it short, impactful, and focused on the core message.  
+- Title: Ensure it aligns with the <Editor's Instructions>, making it short, impactful, and focused on the core message.  
 - Summary: Two brief bullet points summarizing the key insights.  
 - Lead: A single, condensed sentence summarizing the article.  
 - Body: Write in a continuous flow without subheadings or bullet points.  
@@ -114,7 +114,7 @@ graph.addEdge({
   from: "reviewer-2",
   to: "reporter-2",
   prompt: `First, respond as if speaking to a superior, confirming that you will apply the Feedback in a playful and cute manner, similar to a cheerful young woman in her 20s. Use a tone like:
-"Got it~! I’ll fix it right away! 😊"
+"Got it~! I'll fix it right away! 😊"
 
 Then, apply the Feedback to the Article, ensuring that the original article length remains unchanged while making the necessary improvements.
 
