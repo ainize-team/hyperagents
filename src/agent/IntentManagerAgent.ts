@@ -29,7 +29,6 @@ class IntentManagerAgent {
   private indexFilePath?: string;
   private memory: Memory;
   private memoryType: MemoryType;
-  private validIntents: string[] = [];
   constructor(config: IntentManagerConfig) {
     this.name = config.name;
     this.embeddingApiKey = config.embeddingApiKey;
@@ -51,10 +50,6 @@ class IntentManagerAgent {
       this.memory = InMemoryMemory.getInstance();
     } else {
       throw new Error("Memory type not supported");
-    }
-
-    if (config.validIntents && Array.isArray(config.validIntents)) {
-      this.validIntents = config.validIntents;
     }
   }
 
@@ -255,10 +250,6 @@ class IntentManagerAgent {
 
   public getName(): string {
     return this.name;
-  }
-
-  public getValidIntents(): string[] {
-    return this.validIntents;
   }
 
   public setIndexFilePath(indexFilePath: string): void {

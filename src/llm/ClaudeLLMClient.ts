@@ -35,7 +35,7 @@ export class ClaudeLLMClient implements ILLMClient {
     systemPrompt: string,
     prompt: string,
     mcp: Client,
-    tools: Tool[],
+    tools: Tool[]
   ): Promise<string> {
     const messages: MessageParam[] = [
       {
@@ -68,7 +68,9 @@ export class ClaudeLLMClient implements ILLMClient {
         });
         console.log("result", result);
         toolResults.push(result);
-        finalText.push(`[Calling tool ${toolName} with args ${JSON.stringify(toolArgs)}]`);
+        finalText.push(
+          `[Calling tool ${toolName} with args ${JSON.stringify(toolArgs)}]`
+        );
 
         messages.push({
           role: "user",
@@ -81,7 +83,9 @@ export class ClaudeLLMClient implements ILLMClient {
           messages,
         });
 
-        finalText.push(response.content[0].type === "text" ? response.content[0].text : "");
+        finalText.push(
+          response.content[0].type === "text" ? response.content[0].text : ""
+        );
       }
     }
 

@@ -6,6 +6,7 @@ interface EdgeData {
   from: string;
   prompt: string;
   memoryId?: string;
+  intent?: string[];
   functions?: string[];
 }
 

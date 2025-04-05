@@ -4,7 +4,6 @@
     "llm": "gpt-4o",
     "publicDesc": "IntentManager",
     "memoryType": "InMemory",
-    "validIntents": ["need routing"],
     "intent": [
         {
             "type": "general_recommandation",
@@ -17,7 +16,7 @@
             ]
         },
         {
-            "type": "food_recommandation",
+            "type": "food_recommendation",
             "example": [
                 "I want to know the best food in Korea",
                 "where should I go for a weekend trip?",

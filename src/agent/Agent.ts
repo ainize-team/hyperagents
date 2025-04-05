@@ -12,25 +12,23 @@ import { extractArray, extractString } from "../tools/stringExtractor";
 import { ClaudeLLMClient } from "../llm/ClaudeLLMClient";
 
 class Agent {
-  protected name: string;
-  protected systemPrompt: string;
-  protected llm: LLMType;
-  protected publicDesc: string;
-  protected validIntents: string[];
-  protected llmEndpoint?: string;
-  protected llmApiKey?: string;
-  protected memoryType: MemoryType;
-  protected privateKey?: Map<PrivateKeyType, string>;
-  protected walletDataStr?: string;
-  protected memory: Memory;
-  protected llmClient: ILLMClient;
+  private name: string;
+  private systemPrompt: string;
+  private llm: LLMType;
+  private publicDesc: string;
+  private llmEndpoint?: string;
+  private llmApiKey?: string;
+  private memoryType: MemoryType;
+  private privateKey?: Map<PrivateKeyType, string>;
+  private walletDataStr?: string;
+  private memory: Memory;
+  private llmClient: ILLMClient;
 
   constructor(config: AgentConfigs) {
     this.name = config.name;
     this.systemPrompt = config.systemPrompt;
     this.llm = config.llm;
     this.publicDesc = config.publicDesc;
-    this.validIntents = config.validIntents ?? [];
     this.llmEndpoint = config.llmEndpoint;
     this.llmApiKey = config.llmApiKey;
     this.memoryType = config.memoryType;
@@ -74,11 +72,11 @@ class Agent {
     return this.publicDesc;
   }
 
-  public getValidIntents(): string[] {
-    return this.validIntents;
-  }
-
-  public async run(input: string, resultMemoryId?: string, functions?: string[]): Promise<string> {
+  public async run(
+    input: string,
+    resultMemoryId?: string,
+    functions?: string[]
+  ): Promise<string> {
     const messages = await this.memory.loadMap();
     const processedInput = input.replace(/\^(.*?)\^/g, (_, memoryId) => {
       const memoryData = messages.get(memoryId);
