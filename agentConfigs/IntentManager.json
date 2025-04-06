@@ -1,49 +1,62 @@
 {
-    "name": "IntentManager",
-    "systemPrompt": "You are a manager of intent. You are responsible for managing the intent of the user.",
-    "llm": "gpt-4o",
-    "publicDesc": "IntentManager",
-    "memoryType": "InMemory",
-    "intent": [
-        {
-            "type": "general_recommandation",
-            "example": [
-                "I have about 3 hours before check-in, can you recommend something to do nearby?",
-                "What are some interesting activities I can do in this area?",
-                "Can you suggest some quick activities to fill my free time?",
-                "I'm looking for something to do right now, any recommendations?",
-                "What are popular attractions near me that I can visit?",
-                "I don't know what to do in Gangnam Station"
-            ]
-        },
-        {
-            "type": "food_recommendation",
-            "example": [
-                "I want to know the best food in Korea",
-                "where should I go for a weekend trip?",
-                "Can you recommend some good places to visit in Seoul?",
-                "What are must-visit attractions in Seong-su?",
-                "I'm planning a trip to Gangnam Station, what should I see?",
-                "I hate Korean food, what should I eat?",
-                "Which restaurant is good in Gaepo-dong?"
-            ]
-        },
-        {
-            "type": "grab taxi",
-            "example": [
-                "I want to grab a taxi",
-                "I want to go to Walkerhill Hotel from Incheon Airport"
-            ]
-        },
-        {
-            "type": "looking for travel advice",
-            "example": [
-                "I want to know the best travel destination in Korea",
-                "where should I go for a weekend trip?",
-                "Can you recommend some good places to visit in Seoul?",
-                "What are must-visit attractions in Seong-su?",
-                "I'm planning a trip to Gangnam Station, what should I see?"
-            ]
-        }
-    ]
+  "name": "IntentManager",
+  "systemPrompt": "You are a manager of intent. You are responsible for managing the intent of the user.",
+  "llm": "gpt-4o",
+  "publicDesc": "IntentManager",
+  "memoryType": "InMemory",
+  "intent": [
+    {
+      "type": "general_recommandation",
+      "example": [
+        "I have about 3 hours before check-in, can you recommend something to do nearby?",
+        "What are some interesting activities I can do in this area?",
+        "Can you suggest some quick activities to fill my free time?",
+        "I'm looking for something to do right now, any recommendations?",
+        "What are popular attractions near me that I can visit?",
+        "I don't know what to do in Gangnam Station"
+      ]
+    },
+    {
+      "type": "food_recommendation",
+      "example": [
+        "I want to know the best food in Korea",
+        "where should I go for a weekend trip?",
+        "Can you recommend some good places to visit in Seoul?",
+        "What are must-visit attractions in Seong-su?",
+        "I'm planning a trip to Gangnam Station, what should I see?",
+        "I hate Korean food, what should I eat?",
+        "Which restaurant is good in Gaepo-dong?",
+        "I’m at a hackathon and I’m tired of eating Hansot Dosirak. Can you recommend a good place for dinner?",
+        "Can you recommend the restaurant near Gaepo-dong? I want to have a luxury dinner."
+      ]
+    },
+    {
+      "type": "grab taxi",
+      "example": [
+        "I want to grab a taxi",
+        "I want to go to Walkerhill Hotel from Incheon Airport"
+      ]
+    },
+    {
+      "type": "looking for travel advice",
+      "example": [
+        "I want to know the best travel destination in Korea",
+        "where should I go for a weekend trip?",
+        "Can you recommend some good places to visit in Seoul?",
+        "What are must-visit attractions in Seong-su?",
+        "I'm planning a trip to Gangnam Station, what should I see?"
+      ]
+    },
+    {
+      "type": "find_server",
+      "example": [
+        "I arrived at myungwol_gwan. What should I do?",
+        "I arrived at Eunma Wang Mandu. What should I eat?"
+      ]
+    },
+    {
+      "type": "order_food",
+      "example": ["I want to order 2 kimbap", ""]
+    }
+  ]
 }
